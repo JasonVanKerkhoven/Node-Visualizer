@@ -11,7 +11,7 @@
 * 
 * 
 *Update Log:		v0.4.0
-*						- 
+*						-  
 *					v0.3.0
 *						- indirect add, remove, link, and delink modified to use 
 *						  a common intermediate method
