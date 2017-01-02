@@ -3,14 +3,16 @@
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
 *Date of Update:    01/01/2017                                              
-*Version:           0.1.0                                                      
+*Version:           0.4.0                                                      
 *                                                                                   
 *Purpose:           Built due to complexities with delinking nodes.
 *					Internally support linking n amount of nodes to a node.
 *					Additionally supports delinking a node from ALL nodes.
 * 
 * 
-*Update Log:		v0.3.0
+*Update Log:		v0.4.0
+*						- 
+*					v0.3.0
 *						- indirect add, remove, link, and delink modified to use 
 *						  a common intermediate method
 *						- direct add(...) method removed
