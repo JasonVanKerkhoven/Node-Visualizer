@@ -81,6 +81,7 @@ public class Node
 	//delink a node from this node
 	public void delink(Node toRemove) throws NetworkException
 	{
+		System.out.println("CALLED");
 		boolean nodeFound = outLinks.remove(toRemove);
 		if(nodeFound)
 		{
@@ -97,18 +98,8 @@ public class Node
 	@Override
 	public String toString()
 	{
-		String string = "ID:" + id + "   || Node containing '" + value + "' outlinks to node(s) <" ;
+		String string = "ID:" + id + "   || Node containing '" + value + "' inlinks from node(s) <" ;
 		
-		for(int i=0; i < outLinks.size(); i++)
-		{
-			if(i!=0)
-			{
-				string += ", ";
-			}
-			string += outLinks.get(i).getId();
-		}
-		
-		string += "> inlinks from node(s) <" ;
 		for(int i=0; i < inLinks.size(); i++)
 		{
 			if(i!=0)
@@ -116,6 +107,16 @@ public class Node
 				string += ", ";
 			}
 			string += inLinks.get(i).getId();
+		}
+		
+		string += "> outlinks to node(s) <";
+		for(int i=0; i < outLinks.size(); i++)
+		{
+			if(i!=0)
+			{
+				string += ", ";
+			}
+			string += outLinks.get(i).getId();
 		}
 		
 		return (string + ">");

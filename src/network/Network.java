@@ -5,14 +5,16 @@
 *Date of Update:    02/01/2017                                              
 *Version:           0.4.0                                                      
 *                                                                                   
-*Purpose:           Built due to complexities with delinking nodes.
-*					Internally support linking n amount of nodes to a node.
-*					Additionally supports delinking a node from ALL nodes.
-* 
+*Purpose:           Controller for a collection of nodes which can be linked to n amount of other nodes.
+*					Nodes are all doubly linked.
+*					Network supports orphaned Nodes (unlinked to anything else in network)
+*
 * 
 *Update Log:		v0.4.0
 *						- renamed to Network.java
 *						- toString() rewritten
+*						- delinkAll(...) methods added to make orphan nodes
+*						- remove(...) method bug fixed, now calls delinkAll(...)
 *					v0.3.0
 *						- indirect add, remove, link, and delink modified to use 
 *						  a common intermediate method
@@ -24,18 +26,19 @@
 *						- clear() method added
 *					v0.1.0
 *						- addNode(...) method logic added
-*						- removeNode(...) method logic added
 *						- linkNode(...) method logic added
 *						- delinkNode(...) method logic added
+*						- remove(...) method added for unlinking and removing a node
 * 
 */
 package network;
 
 
-import java.util.Collection;
+
 //import external libraries
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Collection;
 import java.util.Set;
 
 
@@ -73,43 +76,99 @@ public class Network
 	//find and remove a node from the graph based on ID
 	public void remove(int id) throws NetworkException
 	{
-		removeNode(idMap.get(id));
+		remove(idMap.get(id));
 		return;
 	}
 	
 	
 	//remove a node from the graph, delink it from all other nodes
-	public void removeNode(Node node) throws NetworkException
+	public void remove(Node node) throws NetworkException
 	{
-
+		//make node an orphan
+		delinkAll(node);
+		//remove node from hashmap
+		idMap.remove(node.getId());
+		
 	}
 	
 	
 	//find and link two nodes, based on id
 	public void link(int start, int end) throws NetworkException
 	{
-		linkNode(idMap.get(start), idMap.get(end));
+		link(idMap.get(start), idMap.get(end));
 	}
 	
 	
 	//link a node in graph to another pre-existing node
-	public void linkNode(Node start, Node end) throws NetworkException
+	public void link(Node start, Node end) throws NetworkException
 	{
-
+		if(start != null && end != null)
+		{
+			start.link(end);
+		}
+		else
+		{
+			throw new NetworkException("Node not found", "Linking Error");
+		}
 	}
 	
 	
 	//find and delink two nodes, based on id
 	public void delink(int start, int end) throws NetworkException
 	{
-		delinkNode(idMap.get(start), idMap.get(end));
+		delink(idMap.get(start), idMap.get(end));
 	}
 	
 	
 	//delink a single path
-	public void delinkNode(Node start, Node end) throws NetworkException
+	public void delink(Node start, Node end) throws NetworkException
 	{
-
+		if (start != null && end != null)
+		{
+			start.delink(end);
+		}
+		else
+		{
+			throw new NetworkException("Node not found", "Linking Error");
+		}
+	}
+	
+	
+	//find and make the node an orphan, based on id
+	public void delinkAll(int id) throws NetworkException
+	{
+		delinkAll(idMap.get(id));
+	}
+	
+	
+	//Make a node an orphan (remove all links from and to itself)
+	public void delinkAll(Node node) throws NetworkException
+	{
+		if (node != null)
+		{
+			//get all in/out links
+			LinkedList<Node> inLink = node.getInLinks();
+			LinkedList<Node> outLink = node.getOutLinks();
+			int iPrev = inLink.size();
+			int iPost = outLink.size();
+			
+			//remove pointers to this node from all other nodes
+			for(int i=0; i < iPrev; i++)
+			{
+				Node prevNode = inLink.getFirst();
+				prevNode.delink(node);
+			}
+			//remove pointers to other nodes from this node
+			for (int i=0; i < iPost; i++)
+			{
+				Node postNode = outLink.getFirst();
+				node.delink(postNode);
+			}
+		}
+		else
+		{
+			throw new NetworkException("Node not found", "Linking Error");
+		}
 	}
 	
 	
@@ -156,3 +215,6 @@ public class Network
 		return string;
 	}
 }
+
+
+
