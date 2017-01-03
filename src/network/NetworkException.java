@@ -1,5 +1,5 @@
 /**
-*Class:             GraphException.java
+*Class:             NetworkException.java
 *Project:           Node Visualizer
 *Author:            Jason Van Kerkhoven                                             
 *Date of Update:    28/12/2016                                              
@@ -10,9 +10,9 @@
 *Update Log:		v1.0.0
 *						- null
 */
-package graph;
+package network;
 
-public class GraphException extends Exception
+public class NetworkException extends Exception
 {
 	//declaring local instance variables
 	public final boolean criticalFlag;
@@ -20,14 +20,14 @@ public class GraphException extends Exception
 	
 	
 	//constructor for non-critical errors (added to keep previous code working)
-	public GraphException(String error, String title)
+	public NetworkException(String error, String title)
 	{
 		this(error, title, false);
 	}
 	
 	
 	//generic constructor
-	public GraphException(String error, String title, boolean critical)
+	public NetworkException(String error, String title, boolean critical)
 	{
 		super(error);
 		msgTitle = title;

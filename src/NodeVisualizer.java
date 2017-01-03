@@ -3,7 +3,7 @@
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
 *Date of Update:    24/12/2016                                              
-*Version:           1.0.0                                                      
+*Version:           0.1.0                                                      
 *                                                                                   
 *Purpose:           Main class and logic for Node Visualizer project.
 *					Add nodes, link them, and view.
@@ -21,7 +21,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 //import internal packages
-import graph.*;
+import network.*;
 import ui.*;
 
 
@@ -32,7 +32,7 @@ public class NodeVisualizer implements ActionListener
 	
 	//declaring local instance variables
 	private NodeUI ui;
-	private Graph nodes;
+	private Network nodes;
 	private boolean verbose;
 	
 	
@@ -41,18 +41,13 @@ public class NodeVisualizer implements ActionListener
 	{
 		//initialize things
 		ui = new NodeUI(this);
-		nodes = new Graph();
+		nodes = new Network();
 		verbose = false;
 		
 		//start UI on new thread
 		Thread uiThread = new Thread(ui);
 		uiThread.start();
-	}
-	
-	
-	//start the node visualizer
-	public void run()
-	{
+		
 		ui.println("NodeVisualizer running on <Thread " + Thread.currentThread().getId() + ">");
 	}
 	
@@ -120,10 +115,10 @@ public class NodeVisualizer implements ActionListener
 						{
 							nodes.add(input[1]);
 						}
-						catch (GraphException ge)
+						catch (NetworkException e)
 						{
-							ui.printError(ge.msgTitle, ge.getMessage());
-							if(ge.criticalFlag)
+							ui.printError(e.msgTitle, e.getMessage());
+							if(e.criticalFlag)
 							{
 								System.exit(0);
 							}
@@ -148,6 +143,5 @@ public class NodeVisualizer implements ActionListener
 	public static void main(String[] args) 
 	{
 		NodeVisualizer nv = new NodeVisualizer();
-		nv.run();
 	}
 }

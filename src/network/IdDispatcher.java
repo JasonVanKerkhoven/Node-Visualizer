@@ -15,7 +15,7 @@
 *						- ID checkout logic added
 *						- ID checkout logic added
 */
-package graph;
+package network;
 
 
 //import external libraries
@@ -40,7 +40,7 @@ public class IdDispatcher
 	
 	
 	//get next available ID
-	public int getNextID() throws GraphException
+	public int getNextID() throws NetworkException
 	{
 		//there is 1 or more retired IDs available, use the lowest value among them
 		if (retired.size() > 0)
@@ -60,7 +60,7 @@ public class IdDispatcher
 		}
 		else
 		{
-			throw new GraphException("No avalible Node ID\nProgram terminating...", "CRITICAL ERROR", true);
+			throw new NetworkException("No avalible Node ID\nProgram terminating...", "CRITICAL ERROR", true);
 		}
 	}
 	
