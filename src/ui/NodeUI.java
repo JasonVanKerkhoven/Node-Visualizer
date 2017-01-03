@@ -21,7 +21,7 @@ package ui;
 
 
 //import packages
-import graph.*;
+import network.*;
 
 //import external libraries 
 import javax.swing.JFrame;
