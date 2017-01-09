@@ -57,6 +57,13 @@ public class Network
 	}
 	
 	
+	//return Collection of all Nodes
+	public Collection getNodes()
+	{
+		return idMap.values();
+	}
+	
+	
 	//clear graph
 	public void clear()
 	{
@@ -196,7 +203,7 @@ public class Network
 		
 		return string;
 	}
-	
+
 	
 	@Override
 	//returns a string of all nodes in network

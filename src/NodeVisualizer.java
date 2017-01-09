@@ -49,7 +49,7 @@ public class NodeVisualizer implements ActionListener
 	public NodeVisualizer()
 	{
 		//initialize things
-		ui = new NodeUI(this);
+		ui = new NodeUI(this, nodes);
 		nodes = new Network();
 		verbose = false;
 		
@@ -158,6 +158,7 @@ public class NodeVisualizer implements ActionListener
 						try
 						{
 							nodes.add(input[1]);
+							ui.updateNodeList();
 						}
 						catch (NetworkException e)
 						{

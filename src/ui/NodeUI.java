@@ -8,7 +8,9 @@
 *Purpose:           UI designed to work with NodeVisualizer.
 *					Only designed to be accessed by a single thread.
 * 
-*Update Log:		v0.2.0
+*Update Log:		v0.2.1
+*						- "on the fly" list of nodes added
+*					v0.2.0
 *						- extra spaces in input ignored
 *						- input parsing patched
 *						- now can have inputs with spaces (surround with quotation marks)
@@ -44,7 +46,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Collection;
 import java.util.LinkedList;
+import java.awt.Color;
 
 
 public class NodeUI implements Runnable, KeyListener
@@ -64,13 +68,16 @@ public class NodeUI implements Runnable, KeyListener
 	private JTextField consoleInput;
 	private JTextArea consoleOutput;
 	private JPanel drawSpace; 
+	private JTextArea nodeList;
+	private Network nodes;
 	
 	
 	//generic constructor
-	public NodeUI(ActionListener listener) 
+	public NodeUI(ActionListener listener, Network nodes) 
 	{
 		//initialize things
 		inputBuffer = new CappedBuffer(25);
+		this.nodes = nodes;
 		
 		//set up main window frame
 		mainFrame = new JFrame(WINDOW_TITLE);
@@ -122,9 +129,19 @@ public class NodeUI implements Runnable, KeyListener
 		
 		//add JPanel for drawing nodes on
 		drawSpace = new JPanel();
-		drawSpace.setBounds(0, 136, DEFAULT_WINDOW_X, 636);
+		drawSpace.setBackground(Color.WHITE);
+		drawSpace.setBounds(177, 136, 1203, 624);
 		drawSpace.setToolTipText("Visual Representation of Nodes");
 		mainFrame.getContentPane().add(drawSpace);
+		
+		//add text area for listing nodes wrapped in scrollPane
+		JScrollPane nodeScrollPane = new JScrollPane();
+		mainFrame.getContentPane().add(nodeScrollPane);
+		nodeList = new JTextArea();
+		nodeList.setEditable(false);
+		nodeList.setFont(DEFAULT_CONSOLE_FONT);
+		nodeScrollPane.setBounds(0, 136, 175, 624);
+		nodeScrollPane.setViewportView(nodeList);
 	}
 	
 	
@@ -272,7 +289,33 @@ public class NodeUI implements Runnable, KeyListener
 	private void drawNode()
 	{
 	}
+	
+	
+	//update the master list of nodes shown to user
+	public void updateNodeList()
+	{
+		final String P_TAB = "   ";
+		String string = "";
+		Collection<Node> values = nodes.getNodes();
+		LinkedList<Node> outLinks;
+		
+		for (Node node : values)
+		{
+			string += "Node " + node.getId() + " : ;" + node.getValue() + "'\n";
+			outLinks = node.getOutLinks();
+			if(outLinks.size() > 0)
+			{
+				string += P_TAB + "--> ";
+				for (Node out : outLinks)
+				{
+					string += out.getId() + ", ";
+				}
+				string += "\n";
+			}
+		}
+	}
 
+	
 	@Override
 	//handle key press
 	public void keyPressed(KeyEvent ke)
