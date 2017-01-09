@@ -162,13 +162,22 @@ public class NodeUI implements Runnable, KeyListener
 	//generate an error popup AND print message to console
 	public void printError(String title, String message)
 	{
-		printPopUp(message, "Error", JOptionPane.ERROR_MESSAGE, title.toUpperCase() + ": " + message);
+		printPopUp(message, title, JOptionPane.ERROR_MESSAGE, title.toUpperCase() + ": " + message);
+	}
+	
+	
+	//clear console
+	public void clearConsole()
+	{
+		consoleOutput.setText("");
+		consoleOutput.setCaretPosition(0);
 	}
 	
 	
 	//print line to console
 	public void println(String printable)
 	{
+		printable = printable.replaceAll("\n", "\n ");
 		consoleOutput.append(" " + printable + "\n");
 		consoleOutput.setCaretPosition(consoleOutput.getDocument().getLength());
 	}

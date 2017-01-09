@@ -31,7 +31,7 @@ public class Node
 	private LinkedList<Node> outLinks;
 	private LinkedList<Node> inLinks;
 	private String value;
-	private int id;
+	private final int id;
 	
 	
 	//generic constructor
@@ -98,7 +98,7 @@ public class Node
 	@Override
 	public String toString()
 	{
-		String string = "ID:" + id + "   || Node containing '" + value + "' inlinks from node(s) <" ;
+		String string = "ID:" + id + "   || '" + value + "' inlinks from node(s) <" ;
 		
 		for(int i=0; i < inLinks.size(); i++)
 		{

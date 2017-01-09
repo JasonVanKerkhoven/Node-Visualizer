@@ -86,8 +86,11 @@ public class Network
 	{
 		//make node an orphan
 		delinkAll(node);
-		//remove node from hashmap
-		idMap.remove(node.getId());
+		//remove node from hashmap, retire ID
+		int id = node.getId();
+		idMap.remove(id);
+		dispatch.retireID(id);
+		
 		
 	}
 	

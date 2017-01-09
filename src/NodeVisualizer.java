@@ -3,13 +3,20 @@
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
 *Date of Update:    24/12/2016                                              
-*Version:           0.1.0                                                      
+*Version:           0.2.0                                                      
 *                                                                                   
 *Purpose:           Main class and logic for Node Visualizer project.
 *					Add nodes, link them, and view.
 * 
 * 
-*Update Log:		v0.1.0
+*Update Log:		v0.2.0
+*						- implements new controller for nodes (Network.java)
+*						- command line for adding nodes
+*						- command line for removing nodes
+*						- command line for linking nodes
+*						- command line for delinking nodes
+*						- command line for reset
+*					v0.1.0
 *						- basic logic for adding nodes implemented
 *						- basic logic for 
 */
@@ -29,6 +36,8 @@ public class NodeVisualizer implements ActionListener
 {
 	//declaring static class constants
 	private String UNKNOWN_INPUT_MSG = "Unknown Command";
+	private String OP_ERROR_NODE = "Nodes must be entered as 'node#' or #.\nWhere # is is any valid integer";
+
 	
 	//declaring local instance variables
 	private NodeUI ui;
@@ -52,6 +61,25 @@ public class NodeVisualizer implements ActionListener
 	}
 	
 	
+	//check valid form of node input, return plain Integer
+	private Integer toID(String string)
+	{
+		string = string.toLowerCase();
+		string = string.replaceAll("node", "");
+		
+		System.out.println(string);
+		
+		try
+		{
+			return Integer.parseInt(string);
+		}
+		catch (NumberFormatException e)
+		{
+			return null;
+		}
+	}
+	
+	
 	@Override
 	//user input entered
 	public void actionPerformed(ActionEvent ae) 
@@ -61,14 +89,7 @@ public class NodeVisualizer implements ActionListener
 		
 		//handle input based on number of words entered
 		if (input != null)
-		{
-			for(int i=0; i<input.length; i++)
-			{
-				System.out.println(i + ": <" + input[i] + ">");
-			}
-			System.out.println();
-			
-			
+		{		
 			switch(input.length)
 			{
 				case(1):
@@ -82,8 +103,14 @@ public class NodeVisualizer implements ActionListener
 						System.exit(0);
 					}
 				
-					//clear all nodes
+					//clear console
 					else if (input[0].equals("clear"))
+					{
+						ui.clearConsole();
+					}
+				
+					//reset all nodes
+					else if (input[0].equals("reset"))
 					{
 						if (verbose)
 						{
@@ -106,22 +133,56 @@ public class NodeVisualizer implements ActionListener
 					}
 				break;
 				
+				
 				case(2):
-					//add node
-					if (input[0].equals("add"))
+					//toggle verbose
+					if (input[0].equals("verbose"))
 					{
-						//create node with value equal to 2nd param
-						try	
+						if(input[1].equals("true"))
+						{
+							verbose = true;
+						}
+						else if (input[1].equals("false"))
+						{
+							verbose = false;
+						}
+						else
+						{
+							ui.printError("Opperand Error", "Verbose must be either 'true' or 'false'");
+						}
+					}
+					
+					//add node
+					else if (input[0].equals("add"))
+					{
+						try
 						{
 							nodes.add(input[1]);
 						}
 						catch (NetworkException e)
 						{
 							ui.printError(e.msgTitle, e.getMessage());
-							if(e.criticalFlag)
+						}
+					}
+				
+					//remove node
+					else if (input[0].equals("remove"))
+					{
+						try
+						{
+							Integer n = toID(input[1]);
+							if (n != null)
 							{
-								System.exit(0);
+								nodes.remove(n);
 							}
+							else
+							{
+								ui.printError("Opperand Error", OP_ERROR_NODE);
+							}
+						}
+						catch (NetworkException e)
+						{
+							ui.printError(e.msgTitle, e.getMessage());
 						}
 					}
 				
@@ -131,7 +192,47 @@ public class NodeVisualizer implements ActionListener
 						ui.println(UNKNOWN_INPUT_MSG);
 					}
 				break;
+				
+				
+				case(4):
+					//link/delink a node
+					if (input[0].equals("link") && input[2].equals("to") || input[0].equals("delink") && input[2].equals("from"))
+					{
+						Integer n1 = toID(input[1]);
+						Integer n2 = toID(input[3]);
+						
+						if (n1 != null && n2 != null)
+						{
+							try
+							{
+								if (input[0].equals("link"))
+								{
+									nodes.link(n1, n2);
+								}
+								else
+								{
+									nodes.delink(n1, n2);
+								}
+							}
+							catch (NetworkException e)
+							{
+								ui.printError(e.msgTitle, e.getMessage());
+							}
+						}
+						else
+						{
+							ui.printError("Opperand Error", OP_ERROR_NODE);
+						}
+					}
 					
+					//unknown
+					else
+					{
+						ui.println(UNKNOWN_INPUT_MSG);
+					}
+				break;
+				
+				
 				default:
 					ui.println(UNKNOWN_INPUT_MSG);
 				break;
