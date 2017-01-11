@@ -387,5 +387,51 @@ public class NetworkTestBench
 			System.out.println(e.toString());
 		}
 		printResult(network);
+		
+		
+		//test delinking a node that is linked to itself
+		////////////////////////////////////////////////////////////////////////////////////////////
+		System.out.println("Testing .delink(int) ..." + DIV);
+		System.out.println("Clearing working Network instance...");
+		network.clear();
+		System.out.println("Adding initial node...");
+		try
+		{
+			network.add("Some test node");
+			System.out.println("Linking node to self...");
+			network.link(0, 0);
+			saveState(network);
+			System.out.println("delink node 0 from node 0(linked to self)...");
+			network.delink(0, 0);
+		}
+		catch (NetworkException e)
+		{
+			System.out.println(e.toString());
+		}
+		printResult(network);
+		
+		
+		//test delinking a node that is linked to itself
+		////////////////////////////////////////////////////////////////////////////////////////////
+		System.out.println("Testing .delinkAll(int) ..." + DIV);
+		System.out.println("Clearing working Network instance...");
+		network.clear();
+		System.out.println("Adding initial node...");
+		try
+		{
+			network.add("Of Interest");
+			network.add("Extra");
+			System.out.println("Linking node to self...");
+			network.link(0, 0);
+			network.link(0, 1);
+			saveState(network);
+			System.out.println("delink node 0 from node 0(linked to self)...");
+			network.delink(0, 0);
+		}
+		catch (NetworkException e)
+		{
+			System.out.println(e.toString());
+		}
+		printResult(network);
 	}
 }

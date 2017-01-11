@@ -2,19 +2,23 @@
 *Class:             Network.java
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
-*Date of Update:    02/01/2017                                              
-*Version:           0.4.0                                                      
+*Date of Update:    11/01/2017                                              
+*Version:           1.0.1                                                      
 *                                                                                   
 *Purpose:           Controller for a collection of nodes which can be linked to n amount of other nodes.
 *					Nodes are all doubly linked.
 *					Network supports orphaned Nodes (unlinked to anything else in network)
 *
 * 
-*Update Log:		v0.4.0
+*Update Log:		v1.0.1
+*						- remove(...) method changed to fix error during removing
+*						  a node that was linked to itself
+*					v1.0.0
 *						- renamed to Network.java
 *						- toString() rewritten
 *						- delinkAll(...) methods added to make orphan nodes
 *						- remove(...) method bug fixed, now calls delinkAll(...)
+*						- tested and is A-Okay for use :)
 *					v0.3.0
 *						- indirect add, remove, link, and delink modified to use 
 *						  a common intermediate method
@@ -97,8 +101,6 @@ public class Network
 		int id = node.getId();
 		idMap.remove(id);
 		dispatch.retireID(id);
-		
-		
 	}
 	
 	
@@ -159,17 +161,18 @@ public class Network
 			//get all in/out links
 			LinkedList<Node> inLink = node.getInLinks();
 			LinkedList<Node> outLink = node.getOutLinks();
-			int iPrev = inLink.size();
-			int iPost = outLink.size();
+			int iMax;
 			
 			//remove pointers to this node from all other nodes
-			for(int i=0; i < iPrev; i++)
+			iMax = inLink.size();
+			for(int i=0; i < iMax; i++)
 			{
 				Node prevNode = inLink.getFirst();
 				prevNode.delink(node);
 			}
 			//remove pointers to other nodes from this node
-			for (int i=0; i < iPost; i++)
+			iMax = outLink.size();
+			for (int i=0; i < iMax; i++)
 			{
 				Node postNode = outLink.getFirst();
 				node.delink(postNode);

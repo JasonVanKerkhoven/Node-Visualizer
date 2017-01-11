@@ -127,6 +127,32 @@ public class Node
 	{
 		return ("Node containing: '" + value +"'");
 	}
+	
+	
+	/*
+	public static void main(String[] args) 
+	{
+		Node node = new Node("Hello World", 0);
+		try 
+		{
+			node.link(node);
+		}
+		catch (Exception e)
+		{
+			System.out.println("HELP LINKING");
+		}
+		System.out.println(node.toString());
+		try
+		{
+			node.delink(node);
+		}
+		catch (Exception e)
+		{
+			System.out.println("HELP DELINKING");
+		}
+		System.out.println(node.toString());
+	}
+	*/
 }
 
 
