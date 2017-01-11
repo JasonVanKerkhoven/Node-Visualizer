@@ -10,6 +10,7 @@
 * 
 *Update Log:		v0.2.1
 *						- "on the fly" list of nodes added
+*						- instances of NodeUI save associated Network as a field
 *					v0.2.0
 *						- extra spaces in input ignored
 *						- input parsing patched
@@ -54,7 +55,7 @@ import java.awt.Color;
 public class NodeUI implements Runnable, KeyListener
 {
 	//declaring class constants
-	private static final String VERSION = "0.1.0 alpha";
+	private static final String VERSION = "0.2.0";
 	private static final String WINDOW_TITLE = "Node Visualizer " + VERSION ;
 	private static final Font DEFAULT_CONSOLE_FONT = new Font("Monospaced", Font.PLAIN, 11);
 	private static final int DEFAULT_WINDOW_X = 1500;
@@ -70,7 +71,7 @@ public class NodeUI implements Runnable, KeyListener
 	private JPanel drawSpace; 
 	private JTextArea nodeList;
 	private Network nodes;
-	
+
 	
 	//generic constructor
 	public NodeUI(ActionListener listener, Network nodes) 
@@ -106,7 +107,7 @@ public class NodeUI implements Runnable, KeyListener
 		//set up split pane for console objects
 		JSplitPane consolePane = new JSplitPane();
 		consolePane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		consolePane.setBounds(0, 26, DEFAULT_WINDOW_X, 110);
+		consolePane.setBounds(10, 26, 1474, 110);
 		mainFrame.getContentPane().add(consolePane);
 		
 		//add JTextArea to consolePane for console output (JTextArea in JScrollPane object w/ word wrap)
@@ -130,7 +131,7 @@ public class NodeUI implements Runnable, KeyListener
 		//add JPanel for drawing nodes on
 		drawSpace = new JPanel();
 		drawSpace.setBackground(Color.WHITE);
-		drawSpace.setBounds(177, 136, 1203, 624);
+		drawSpace.setBounds(177, 136, 1307, 624);
 		drawSpace.setToolTipText("Visual Representation of Nodes");
 		mainFrame.getContentPane().add(drawSpace);
 		
@@ -140,7 +141,7 @@ public class NodeUI implements Runnable, KeyListener
 		nodeList = new JTextArea();
 		nodeList.setEditable(false);
 		nodeList.setFont(DEFAULT_CONSOLE_FONT);
-		nodeScrollPane.setBounds(0, 136, 175, 624);
+		nodeScrollPane.setBounds(10, 136, 165, 624);
 		nodeScrollPane.setViewportView(nodeList);
 	}
 	
@@ -301,18 +302,18 @@ public class NodeUI implements Runnable, KeyListener
 		
 		for (Node node : values)
 		{
-			string += "Node " + node.getId() + " : ;" + node.getValue() + "'\n";
+			string += "Node " + node.getId() + ": '" + node.getValue() + "'\n";
 			outLinks = node.getOutLinks();
 			if(outLinks.size() > 0)
 			{
-				string += P_TAB + "--> ";
 				for (Node out : outLinks)
 				{
-					string += out.getId() + ", ";
+					string += P_TAB + "--> Node " + out.getId() + "\n";
 				}
-				string += "\n";
 			}
 		}
+		
+		nodeList.setText(string);
 	}
 
 	

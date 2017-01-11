@@ -3,7 +3,7 @@
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
 *Date of Update:    24/12/2016                                              
-*Version:           0.2.0                                                      
+*Version:           0.2.0                                         
 *                                                                                   
 *Purpose:           Main class and logic for Node Visualizer project.
 *					Add nodes, link them, and view.
@@ -36,7 +36,7 @@ public class NodeVisualizer implements ActionListener
 {
 	//declaring static class constants
 	private String UNKNOWN_INPUT_MSG = "Unknown Command";
-	private String OP_ERROR_NODE = "Nodes must be entered as 'node#' or #.\nWhere # is is any valid integer";
+	private String OP_ERROR_NODE = "Nodes must be entered as 'node#' or '#'.\nWhere # is is any valid integer";
 
 	
 	//declaring local instance variables
@@ -49,8 +49,8 @@ public class NodeVisualizer implements ActionListener
 	public NodeVisualizer()
 	{
 		//initialize things
-		ui = new NodeUI(this, nodes);
 		nodes = new Network();
+		ui = new NodeUI(this, nodes);
 		verbose = false;
 		
 		//start UI on new thread
@@ -64,11 +64,11 @@ public class NodeVisualizer implements ActionListener
 	//check valid form of node input, return plain Integer
 	private Integer toID(String string)
 	{
+		//remove word "node" from string
 		string = string.toLowerCase();
 		string = string.replaceAll("node", "");
-		
-		System.out.println(string);
-		
+
+		//convert number to int, return null if NaN
 		try
 		{
 			return Integer.parseInt(string);
@@ -118,6 +118,7 @@ public class NodeVisualizer implements ActionListener
 							ui.println("Resting ID Dispatcher...");
 						}
 						nodes.clear();
+						ui.updateNodeList();
 					}
 				
 					//print string representation of all nodes
@@ -167,7 +168,7 @@ public class NodeVisualizer implements ActionListener
 					}
 				
 					//remove node
-					else if (input[0].equals("remove"))
+					else if (input[0].equals("remove"))			//TODO PLS FIX ME
 					{
 						try
 						{
@@ -175,6 +176,7 @@ public class NodeVisualizer implements ActionListener
 							if (n != null)
 							{
 								nodes.remove(n);
+								ui.updateNodeList();
 							}
 							else
 							{
@@ -212,8 +214,10 @@ public class NodeVisualizer implements ActionListener
 								}
 								else
 								{
-									nodes.delink(n1, n2);
+									nodes.delink(n2, n1);
 								}
+								
+								ui.updateNodeList();
 							}
 							catch (NetworkException e)
 							{

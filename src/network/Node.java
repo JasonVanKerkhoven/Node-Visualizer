@@ -81,7 +81,6 @@ public class Node
 	//delink a node from this node
 	public void delink(Node toRemove) throws NetworkException
 	{
-		System.out.println("CALLED");
 		boolean nodeFound = outLinks.remove(toRemove);
 		if(nodeFound)
 		{
