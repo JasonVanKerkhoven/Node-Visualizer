@@ -2,14 +2,20 @@
 *Class:             NodeVisualizer.java
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
-*Date of Update:    24/12/2016                                              
-*Version:           0.2.0                                         
+*Date of Update:    12/01/2016                                              
+*Version:           0.3.0                                         
 *                                                                                   
 *Purpose:           Main class and logic for Node Visualizer project.
 *					Add nodes, link them, and view.
 * 
 * 
-*Update Log:		v0.2.0
+*Update Log:		v0.3.0
+*						- ui runs on single thread with Node Visualizer now
+*						- event handling for multiple ActionEvents implemented
+*						- adding new nodes from menu bar implemented
+*						- exiting via menu bar implemented
+*						- verbose toggling via menu bar implemented
+*					v0.2.0
 *						- implements new controller for nodes (Network.java)
 *						- command line for adding nodes
 *						- command line for removing nodes
@@ -18,7 +24,6 @@
 *						- command line for reset
 *					v0.1.0
 *						- basic logic for adding nodes implemented
-*						- basic logic for 
 */
 
 
@@ -34,10 +39,14 @@ import ui.*;
 
 public class NodeVisualizer implements ActionListener
 {
-	//declaring static class constants
-	private String UNKNOWN_INPUT_MSG = "Unknown Command";
-	private String OP_ERROR_NODE = "Nodes must be entered as 'node#' or '#'.\nWhere # is is any valid integer";
-
+	//declaring local static class constants
+	private static final String UNKNOWN_INPUT_MSG = "Unknown Command";
+	private static final String OP_ERROR_NODE = "Nodes must be entered as 'node#' or '#'.\nWhere # is is any valid integer";
+	
+	//declaring local instance constants
+	private final Object mntmExit;
+	private final Object mntmAddNew, mntmRemove, mntmChangeValue, mntmLink, mntmDelink;
+	private final Object mntmVerboseMode;
 	
 	//declaring local instance variables
 	private NodeUI ui;
@@ -53,13 +62,26 @@ public class NodeVisualizer implements ActionListener
 		ui = new NodeUI(this, nodes);
 		verbose = false;
 		
-		//start UI on new thread
-		Thread uiThread = new Thread(ui);
-		uiThread.start();
+		this.mntmExit = ui.getMntmExit();
 		
-		ui.println("NodeVisualizer running on <Thread " + Thread.currentThread().getId() + ">");
+		this.mntmAddNew = ui.getMntmAddNew();
+		this.mntmChangeValue = ui.getMntmChangeValue();
+		this.mntmDelink = ui.getMntmDelink();
+		this.mntmLink = ui.getMntmLink();
+		this.mntmRemove = ui.getMntmRemove();
+		
+		this.mntmVerboseMode = ui.getMntmVerbose();
+		
+		ui.println("Node Visualizer running...");
 	}
 	
+	
+	//exit program
+	private void exit()
+	{
+		if(verbose) ui.println("Shutdown Acknowledged");
+		System.exit(0);
+	}
 	
 	//check valid form of node input, return plain Integer
 	private Integer toID(String string)
@@ -80,27 +102,22 @@ public class NodeVisualizer implements ActionListener
 	}
 	
 	
-	@Override
-	//user input entered
-	public void actionPerformed(ActionEvent ae) 
+	//does what the tin says
+	private void handleConsoleInput()
 	{
 		//get and parse input
 		String input[] = ui.getParsedInput();
 		
 		//handle input based on number of words entered
-		if (input != null)
+		if (input != null && input.length > 0)
 		{		
 			switch(input.length)
 			{
 				case(1):
 					//close the program
-					if (input[0].equals("close"))
+					if (input[0].equals("close") || input[0].equals("exit"))
 					{
-						if(verbose)
-						{
-							ui.println("Shutdown Acknowledged");
-						}
-						System.exit(0);
+						exit();
 					}
 				
 					//clear console
@@ -151,6 +168,7 @@ public class NodeVisualizer implements ActionListener
 						{
 							ui.printError("Opperand Error", "Verbose must be either 'true' or 'false'");
 						}
+						ui.setVerbose(verbose);
 					}
 					
 					//add node
@@ -168,7 +186,7 @@ public class NodeVisualizer implements ActionListener
 					}
 				
 					//remove node
-					else if (input[0].equals("remove"))			//TODO PLS FIX ME
+					else if (input[0].equals("remove"))
 					{
 						try
 						{
@@ -176,6 +194,28 @@ public class NodeVisualizer implements ActionListener
 							if (n != null)
 							{
 								nodes.remove(n);
+								ui.updateNodeList();
+							}
+							else
+							{
+								ui.printError("Opperand Error", OP_ERROR_NODE);
+							}
+						}
+						catch (NetworkException e)
+						{
+							ui.printError(e.msgTitle, e.getMessage());
+						}
+					}
+				
+					//delink all nodes
+					else if (input[0].equals("delink"))
+					{
+						try
+						{
+							Integer n = toID(input[1]);
+							if ( n != null)
+							{
+								nodes.delinkAll(n);
 								ui.updateNodeList();
 							}
 							else
@@ -198,7 +238,7 @@ public class NodeVisualizer implements ActionListener
 				
 				
 				case(4):
-					//link/delink a node
+					//link OR delink a node
 					if (input[0].equals("link") && input[2].equals("to") || input[0].equals("delink") && input[2].equals("from"))
 					{
 						Integer n1 = toID(input[1]);
@@ -242,6 +282,77 @@ public class NodeVisualizer implements ActionListener
 					ui.println(UNKNOWN_INPUT_MSG);
 				break;
 			}
+		}
+	}
+	
+	
+	@Override
+	//user input entered
+	public void actionPerformed(ActionEvent ae) 
+	{
+		//determine source and handle accordingly
+		Object o = ae.getSource();
+		try
+		{
+			//exit program
+			if (o == this.mntmExit)
+			{
+				exit();
+			}
+			
+			//add a new node via menu bar
+			if (o == this.mntmAddNew)
+			{
+				if(verbose) ui.println("Node/Add New pressed");
+				String toAdd = ui.getInputString("Add Node", "Enter the contents of the new node.");
+				nodes.add(toAdd);
+				ui.updateNodeList();
+			}
+			
+			//change the value of a node via menu bar
+			else if (o == this.mntmChangeValue)
+			{
+				//TODO
+				if(verbose) ui.println("Node/Change Value pressed");
+			}
+			
+			//delink a node via menu bar
+			else if (o == this.mntmDelink)
+			{
+				//TODO
+				if(verbose) ui.println("Node/Delink pressed");
+			}
+			
+			//link a node via menu bar
+			else if (o == this.mntmLink)
+			{
+				//TODO
+				if(verbose) ui.println("Node/Link pressed");
+			}
+			
+			//remove a node via menu bar
+			else if (o == this.mntmRemove)
+			{
+				//TODO
+				if(verbose) ui.println("Node/Remove pressed");
+			}
+			
+			//toggle verbose mode
+			else if (o == this.mntmVerboseMode)
+			{
+				if(verbose) ui.println("Options/Verbose Mode");
+				verbose = ui.getVerbose();
+			}
+			
+			//parse command from cmdline
+			else
+			{
+				handleConsoleInput();
+			}
+		}
+		catch (NetworkException e)
+		{
+			ui.printError(e.msgTitle, e.getMessage());
 		}
 	}
 	

@@ -2,13 +2,23 @@
 *Class:             NodeException.java
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
-*Date of Update:    24/12/2016                                              
-*Version:           0.2.0                                                      
+*Date of Update:    12/01/2016                                              
+*Version:           0.3.0                                                      
 *                                                                                   
 *Purpose:           UI designed to work with NodeVisualizer.
 *					Only designed to be accessed by a single thread.
 * 
-*Update Log:		v0.2.1
+*Update Log:		v0.3.0
+*						- printPopUp(...) renamed to printInfoPopUp(...)
+*						- menu items added to Node menu bar
+*						- action events added for menu items
+*						- runs on a single thread with NodeVisualizer instance
+*						- basic getters for menu bar items added
+*						- method added to handle "Add New" menu bar item press
+*						- File tab now is BEFORE Edit tab
+*						- Close menu item added to File tab
+*						- Verbose toggle added to Options tab
+*					v0.2.1
 *						- "on the fly" list of nodes added
 *						- instances of NodeUI save associated Network as a field
 *					v0.2.0
@@ -18,7 +28,7 @@
 *						- added fancy pop ups for errors
 *						- console buffer added
 *					v0.1.0
-*						- basic template for javax.swing UI objects
+*						- basic template
 */
 package ui;
 
@@ -52,7 +62,7 @@ import java.util.LinkedList;
 import java.awt.Color;
 
 
-public class NodeUI implements Runnable, KeyListener
+public class NodeUI implements KeyListener
 {
 	//declaring class constants
 	private static final String VERSION = "0.2.0";
@@ -62,14 +72,20 @@ public class NodeUI implements Runnable, KeyListener
 	private static final int DEFAULT_WINDOW_Y = 800;
 	
 	//declaring local instance variables
-	private CappedBuffer inputBuffer;
 	private JFrame mainFrame;
 	private JMenuBar menuBar;
-	private JMenu mnFile, mnAdd, mnNode, mnOptions, mnHelp;
 	private JTextField consoleInput;
 	private JTextArea consoleOutput;
 	private JPanel drawSpace; 
 	private JTextArea nodeList;
+	//items in "File" tab
+	private JMenuItem mntmExit;
+	//items in "Node" tab
+	private JMenuItem mntmAddNew, mntmRemove, mntmChangeValue, mntmLink, mntmDelink;
+	//items in "Options" tab
+	private JCheckBoxMenuItem mntmVerboseMode;
+	
+	private CappedBuffer inputBuffer;
 	private Network nodes;
 
 	
@@ -80,6 +96,7 @@ public class NodeUI implements Runnable, KeyListener
 		inputBuffer = new CappedBuffer(25);
 		this.nodes = nodes;
 		
+		
 		//set up main window frame
 		mainFrame = new JFrame(WINDOW_TITLE);
 		mainFrame.setResizable(false);
@@ -87,28 +104,71 @@ public class NodeUI implements Runnable, KeyListener
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.getContentPane().setLayout(null);
 		
+		
 		//set up menu bar
 		menuBar = new JMenuBar();
 		menuBar.setBounds(0, 0, DEFAULT_WINDOW_X, 26);
 		mainFrame.getContentPane().add(menuBar);
 		
-		//add items to menu bar
-		mnFile = new JMenu("File");
+		
+		//add categories to menu bar
+		JMenu mnFile = new JMenu("File");
+		JMenu mnEdit = new JMenu("Edit");
+		JMenu mnNode = new JMenu("Node");
+		JMenu mnOptions = new JMenu("Options");
+		JMenu mnHelp = new JMenu("Help");
 		menuBar.add(mnFile);
-		mnAdd = new JMenu("Edit");
-		menuBar.add(mnAdd);
-		mnNode = new JMenu("Node");
+		menuBar.add(mnEdit);
 		menuBar.add(mnNode);
-		mnOptions = new JMenu("Options");
 		menuBar.add(mnOptions);
-		mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
+		
+		
+		//add menu items to "File" category
+		mntmExit = new JMenuItem("Exit");
+		mnFile.add(mntmExit);
+		
+		mntmExit.addActionListener(listener);
+		
+		
+		//add menu items to "Node" category
+		mntmAddNew = new JMenuItem("Add New");
+		mntmRemove = new JMenuItem("Remove");
+		mntmChangeValue = new JMenuItem("Change Value");
+		mntmLink = new JMenuItem("Link");
+		mntmDelink = new JMenuItem("Delink");
+		mnNode.add(mntmAddNew);
+		mnNode.add(mntmRemove);
+		mnNode.add(mntmChangeValue);
+		mnNode.add(mntmLink);
+		mnNode.add(mntmDelink);
+		
+		mntmAddNew.addActionListener(listener);
+		mntmRemove.addActionListener(listener);
+		mntmChangeValue.addActionListener(listener);
+		mntmLink.addActionListener(listener);
+		mntmDelink.addActionListener(listener);
+		
+		mntmAddNew.setMnemonic('A');
+		mntmRemove.setMnemonic('R');
+		mntmChangeValue.setMnemonic('S');
+		mntmLink.setMnemonic('L');
+		mntmDelink.setMnemonic('D');
+		
+		
+		//add menu items to "Options" category
+		mntmVerboseMode = new JCheckBoxMenuItem("Verbose/Debug Mode");
+		mnOptions.add(mntmVerboseMode);
+		
+		mntmVerboseMode.addActionListener(listener);
+		
 		
 		//set up split pane for console objects
 		JSplitPane consolePane = new JSplitPane();
 		consolePane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		consolePane.setBounds(10, 26, 1474, 110);
 		mainFrame.getContentPane().add(consolePane);
+		
 		
 		//add JTextArea to consolePane for console output (JTextArea in JScrollPane object w/ word wrap)
 		consoleOutput = new JTextArea();
@@ -119,6 +179,7 @@ public class NodeUI implements Runnable, KeyListener
 		JScrollPane scrollPane = new JScrollPane(consoleOutput);
 		consolePane.setLeftComponent(scrollPane);
 		
+		
 		//add JconsoleInput for console input
 		consoleInput = new JTextField();
 		consoleInput.setToolTipText("Console Input");
@@ -128,12 +189,14 @@ public class NodeUI implements Runnable, KeyListener
 		consoleInput.addKeyListener(this);
 		consolePane.setRightComponent(consoleInput);
 		
+		
 		//add JPanel for drawing nodes on
 		drawSpace = new JPanel();
 		drawSpace.setBackground(Color.WHITE);
 		drawSpace.setBounds(177, 136, 1307, 624);
 		drawSpace.setToolTipText("Visual Representation of Nodes");
 		mainFrame.getContentPane().add(drawSpace);
+		
 		
 		//add text area for listing nodes wrapped in scrollPane
 		JScrollPane nodeScrollPane = new JScrollPane();
@@ -143,13 +206,8 @@ public class NodeUI implements Runnable, KeyListener
 		nodeList.setFont(DEFAULT_CONSOLE_FONT);
 		nodeScrollPane.setBounds(10, 136, 165, 624);
 		nodeScrollPane.setViewportView(nodeList);
-	}
-	
-	
-	@Override
-	//run on new thread
-	public void run() 
-	{
+		
+		
 		//set visible
 		try 
 		{
@@ -160,14 +218,54 @@ public class NodeUI implements Runnable, KeyListener
 			e.printStackTrace();
 			System.exit(0);
 		}
-		
-		//print thread ID
-		println("UI running on <Thread " + Thread.currentThread().getId() + ">");
 	}
 	
 	
+	//generic accessors
+	public Object getMntmExit()
+	{
+		return this.mntmExit;
+	}
+	public Object getMntmAddNew()
+	{
+		return this.mntmAddNew;
+	}
+	public Object getMntmRemove()
+	{
+		return this.mntmRemove;
+	}
+	public Object getMntmChangeValue()
+	{
+		return this.mntmChangeValue;
+	}
+	public Object getMntmLink()
+	{
+		return this.mntmLink;
+	}
+	public Object getMntmDelink()
+	{
+		return this.mntmDelink;
+	}
+	public Object getMntmVerbose()
+	{
+		return this.mntmVerboseMode;
+	}
+	
+	
+	//set the status of the VerboseMode checkbox
+	public void setVerbose(boolean b)
+	{
+		this.mntmVerboseMode.setSelected(b);
+	}
+	//get the statue of the VerboseMode checkbox
+	public boolean getVerbose()
+	{
+		return this.mntmVerboseMode.isSelected();
+	}
+
+	
 	//master method for printing a popup message, prints the same message to console outputArea as well
-	private synchronized void printPopUp(String message, String title, int messageType, String consolePrint)
+	private void printInfoPopUp(String message, String title, int messageType, String consolePrint)
 	{
 		if (consolePrint != null)
 		{
@@ -180,7 +278,7 @@ public class NodeUI implements Runnable, KeyListener
 	//generate an error popup AND print message to console
 	public void printError(String title, String message)
 	{
-		printPopUp(message, title, JOptionPane.ERROR_MESSAGE, title.toUpperCase() + ": " + message);
+		printInfoPopUp(message, title, JOptionPane.ERROR_MESSAGE, title.toUpperCase() + ": " + message);
 	}
 	
 	
@@ -314,6 +412,13 @@ public class NodeUI implements Runnable, KeyListener
 		}
 		
 		nodeList.setText(string);
+	}
+	
+	
+	//Add New menu item pressed
+	public String getInputString(String title, String msg)
+	{
+		return JOptionPane.showInputDialog(mainFrame, msg, title, JOptionPane.QUESTION_MESSAGE);
 	}
 
 	

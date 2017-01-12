@@ -20,7 +20,7 @@ import network.*;
 
 public class NetworkTestBench 
 {	
-	public static String preHash,preNetwork;
+	private static String preHash,preNetwork;
 	
 	
 	public static void saveState(Network network)
@@ -391,15 +391,22 @@ public class NetworkTestBench
 		
 		//test delinking a node that is linked to itself
 		////////////////////////////////////////////////////////////////////////////////////////////
-		System.out.println("Testing .delink(int) ..." + DIV);
+		/*
+		 * 		|<---------|
+		 * 		|		   |
+		 * 		|--> Node_0 --------> Node_1
+		 */
+		System.out.println("Testing .delink(int) ...               delink a node from itself" + DIV);
 		System.out.println("Clearing working Network instance...");
 		network.clear();
-		System.out.println("Adding initial node...");
+		System.out.println("Adding initial nodes...");
 		try
 		{
-			network.add("Some test node");
-			System.out.println("Linking node to self...");
+			network.add("Test Node");
+			network.add("Extra");
+			System.out.println("Linking node 0-->0, 0-->1...");
 			network.link(0, 0);
+			network.link(0, 1);
 			saveState(network);
 			System.out.println("delink node 0 from node 0(linked to self)...");
 			network.delink(0, 0);
@@ -413,24 +420,68 @@ public class NetworkTestBench
 		
 		//test delinking a node that is linked to itself
 		////////////////////////////////////////////////////////////////////////////////////////////
-		System.out.println("Testing .delinkAll(int) ..." + DIV);
+		/*
+		 * 		|<---------|
+		 * 		|		   |
+		 * 		|--> Node_0 --------> Node_1 -------> Node_2 -----|
+		 * 			^											  |
+		 * 			|---------------------------------------------|
+		 */
+		System.out.println("Testing .delinkAll(int) ...             DelinkAll nodes connected to a node linked to itself" + DIV);
 		System.out.println("Clearing working Network instance...");
 		network.clear();
-		System.out.println("Adding initial node...");
+		System.out.println("Adding initial nodes...");
 		try
 		{
-			network.add("Of Interest");
-			network.add("Extra");
-			System.out.println("Linking node to self...");
+			network.add("Node 0");
+			network.add("Node 1");
+			network.add("Node 2");
+			System.out.println("Linking node 0-->0, 0-->1, 1-->2, 2-->0...");
 			network.link(0, 0);
 			network.link(0, 1);
+			network.link(1, 2);
+			network.link(2, 0);
 			saveState(network);
-			System.out.println("delink node 0 from node 0(linked to self)...");
-			network.delink(0, 0);
+			System.out.println("delink node 0 from all");
+			network.delinkAll(0);
 		}
 		catch (NetworkException e)
 		{
 			System.out.println(e.toString());
+		}
+		printResult(network);
+		
+		
+		//test remove a node that is linked to itself
+		////////////////////////////////////////////////////////////////////////////////////////////
+		/*
+		 * 		|<---------|
+		 * 		|		   |
+		 * 		|--> Node_0 --------> Node_1 -------> Node_2 -----|
+		 * 			^											  |
+		 * 			|---------------------------------------------|
+		 */
+		System.out.println("Testing .remove(int) ...         Remove a node connected to itself" + DIV);
+		System.out.println("Clearing working Network instance...");
+		network.clear();
+		System.out.println("Adding initial nodes...");
+		try
+		{
+			network.add("Node 0");
+			network.add("Node 1");
+			network.add("Node 2");
+			System.out.println("Linking node 0-->0, 0-->1, 1-->2, 2-->0...");
+			network.link(0, 0);
+			network.link(0, 1);
+			network.link(1, 2);
+			network.link(2, 0);
+			saveState(network);
+			System.out.println("remove node 0");
+			network.remove(0);
+		}
+		catch (NetworkException e)
+		{
+			System.out.println("ERROR HAS OCCURED" + e.toString());
 		}
 		printResult(network);
 	}
