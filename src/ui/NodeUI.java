@@ -65,7 +65,7 @@ import java.awt.Color;
 public class NodeUI implements KeyListener
 {
 	//declaring class constants
-	private static final String VERSION = "0.2.0";
+	private static final String VERSION = "0.3.0";
 	private static final String WINDOW_TITLE = "Node Visualizer " + VERSION ;
 	private static final Font DEFAULT_CONSOLE_FONT = new Font("Monospaced", Font.PLAIN, 11);
 	private static final int DEFAULT_WINDOW_X = 1500;
@@ -90,15 +90,17 @@ public class NodeUI implements KeyListener
 
 	
 	//generic constructor
-	public NodeUI(ActionListener listener, Network nodes) 
+	public NodeUI(String title, ActionListener listener, Network nodes) 
 	{
 		//initialize things
 		inputBuffer = new CappedBuffer(25);
 		this.nodes = nodes;
+		String frameTitle;
+
 		
 		
 		//set up main window frame
-		mainFrame = new JFrame(WINDOW_TITLE);
+		mainFrame = new JFrame(title);
 		mainFrame.setResizable(false);
 		mainFrame.setBounds(100, 100, DEFAULT_WINDOW_X, DEFAULT_WINDOW_Y);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

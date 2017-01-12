@@ -40,6 +40,7 @@ import ui.*;
 public class NodeVisualizer implements ActionListener
 {
 	//declaring local static class constants
+	private static final String WINDOW_NAME = "Node Visualizer v0.3.0";
 	private static final String UNKNOWN_INPUT_MSG = "Unknown Command";
 	private static final String OP_ERROR_NODE = "Nodes must be entered as 'node#' or '#'.\nWhere # is is any valid integer";
 	
@@ -59,7 +60,7 @@ public class NodeVisualizer implements ActionListener
 	{
 		//initialize things
 		nodes = new Network();
-		ui = new NodeUI(this, nodes);
+		ui = new NodeUI(WINDOW_NAME, this, nodes);
 		verbose = false;
 		
 		this.mntmExit = ui.getMntmExit();
