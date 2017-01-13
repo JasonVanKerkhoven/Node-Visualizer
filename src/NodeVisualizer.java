@@ -3,13 +3,15 @@
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
 *Date of Update:    12/01/2016                                              
-*Version:           0.3.0                                         
+*Version:           0.3.1                                         
 *                                                                                   
 *Purpose:           Main class and logic for Node Visualizer project.
 *					Add nodes, link them, and view.
 * 
 * 
-*Update Log:		v0.3.0
+*Update Log:		v0.3.1
+*						- program can be reset from menubar
+*					v0.3.0
 *						- ui runs on single thread with Node Visualizer now
 *						- event handling for multiple ActionEvents implemented
 *						- adding new nodes from menu bar implemented
@@ -40,12 +42,13 @@ import ui.*;
 public class NodeVisualizer implements ActionListener
 {
 	//declaring local static class constants
-	private static final String WINDOW_NAME = "Node Visualizer v0.3.0";
+	private static final String NAME = "Node Visualizer";
+	private static final String VERSION = " v0.3.1";
 	private static final String UNKNOWN_INPUT_MSG = "Unknown Command";
 	private static final String OP_ERROR_NODE = "Nodes must be entered as 'node#' or '#'.\nWhere # is is any valid integer";
 	
 	//declaring local instance constants
-	private final Object mntmExit;
+	private final Object mntmExit, mntmNew;
 	private final Object mntmAddNew, mntmRemove, mntmChangeValue, mntmLink, mntmDelink;
 	private final Object mntmVerboseMode;
 	
@@ -53,6 +56,7 @@ public class NodeVisualizer implements ActionListener
 	private NodeUI ui;
 	private Network nodes;
 	private boolean verbose;
+	private int lastSavedState;
 	
 	
 	//generic constructor
@@ -60,10 +64,12 @@ public class NodeVisualizer implements ActionListener
 	{
 		//initialize things
 		nodes = new Network();
-		ui = new NodeUI(WINDOW_NAME, this, nodes);
+		ui = new NodeUI(NAME + VERSION, this, nodes);
 		verbose = false;
+		lastSavedState = 0;
 		
 		this.mntmExit = ui.getMntmExit();
+		this.mntmNew = ui.getMntmNew();
 		
 		this.mntmAddNew = ui.getMntmAddNew();
 		this.mntmChangeValue = ui.getMntmChangeValue();
@@ -82,6 +88,17 @@ public class NodeVisualizer implements ActionListener
 	{
 		if(verbose) ui.println("Shutdown Acknowledged");
 		System.exit(0);
+	}
+	
+	
+	//total reset
+	private void reset()
+	{	
+		lastSavedState = 0;
+		verbose = false;
+		ui.clearConsole();
+		nodes.clear();
+		ui.updateNodeList();
 	}
 	
 	//check valid form of node input, return plain Integer
@@ -301,13 +318,35 @@ public class NodeVisualizer implements ActionListener
 				exit();
 			}
 			
+			//restart the program to default state
+			else if (o == this.mntmNew)
+			{
+				boolean b = ui.getInputBool(NAME, "Are you sure you want to close the current session?");
+				
+				//check if reset required
+				if (b)
+				{
+					reset();
+				}
+			}
+			
 			//add a new node via menu bar
-			if (o == this.mntmAddNew)
+			else if (o == this.mntmAddNew)
 			{
 				if(verbose) ui.println("Node/Add New pressed");
 				String toAdd = ui.getInputString("Add Node", "Enter the contents of the new node.");
-				nodes.add(toAdd);
-				ui.updateNodeList();
+				
+				//check returned string for validity
+				if (toAdd != null)
+				{
+					if (!toAdd.equals(""))
+					{
+						nodes.add(toAdd);
+						ui.updateNodeList();
+						return;
+					}
+				}
+				ui.printError("Error", "Value field cannot be left blank");
 			}
 			
 			//change the value of a node via menu bar

@@ -3,12 +3,15 @@
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
 *Date of Update:    12/01/2016                                              
-*Version:           0.3.0                                                      
+*Version:           0.3.1                                                      
 *                                                                                   
 *Purpose:           UI designed to work with NodeVisualizer.
 *					Only designed to be accessed by a single thread.
 * 
-*Update Log:		v0.3.0
+*Update Log:		v0.3.1
+*						- New tabs added in menu bar
+*						- Method for getting boolean value from a dialog box added
+*					v0.3.0
 *						- printPopUp(...) renamed to printInfoPopUp(...)
 *						- menu items added to Node menu bar
 *						- action events added for menu items
@@ -79,7 +82,7 @@ public class NodeUI implements KeyListener
 	private JPanel drawSpace; 
 	private JTextArea nodeList;
 	//items in "File" tab
-	private JMenuItem mntmExit;
+	private JMenuItem mntmExit, mntmNew;
 	//items in "Node" tab
 	private JMenuItem mntmAddNew, mntmRemove, mntmChangeValue, mntmLink, mntmDelink;
 	//items in "Options" tab
@@ -97,7 +100,6 @@ public class NodeUI implements KeyListener
 		this.nodes = nodes;
 		String frameTitle;
 
-		
 		
 		//set up main window frame
 		mainFrame = new JFrame(title);
@@ -128,9 +130,12 @@ public class NodeUI implements KeyListener
 		
 		//add menu items to "File" category
 		mntmExit = new JMenuItem("Exit");
+		mntmNew = new JMenuItem("New");
+		mnFile.add(mntmNew);
 		mnFile.add(mntmExit);
 		
 		mntmExit.addActionListener(listener);
+		mntmNew.addActionListener(listener);
 		
 		
 		//add menu items to "Node" category
@@ -150,12 +155,6 @@ public class NodeUI implements KeyListener
 		mntmChangeValue.addActionListener(listener);
 		mntmLink.addActionListener(listener);
 		mntmDelink.addActionListener(listener);
-		
-		mntmAddNew.setMnemonic('A');
-		mntmRemove.setMnemonic('R');
-		mntmChangeValue.setMnemonic('S');
-		mntmLink.setMnemonic('L');
-		mntmDelink.setMnemonic('D');
 		
 		
 		//add menu items to "Options" category
@@ -227,6 +226,10 @@ public class NodeUI implements KeyListener
 	public Object getMntmExit()
 	{
 		return this.mntmExit;
+	}
+	public Object getMntmNew()
+	{
+		return this.mntmNew;
 	}
 	public Object getMntmAddNew()
 	{
@@ -421,6 +424,42 @@ public class NodeUI implements KeyListener
 	public String getInputString(String title, String msg)
 	{
 		return JOptionPane.showInputDialog(mainFrame, msg, title, JOptionPane.QUESTION_MESSAGE);
+	}
+	
+	
+	//Prompt the user to answer a yes or no question
+	public boolean getInputBool(String title, String msg)
+	{
+		int i = JOptionPane.showConfirmDialog(mainFrame, msg, title, JOptionPane.YES_NO_OPTION);
+		
+		if (i == JOptionPane.YES_OPTION)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	
+	//Prompt the selection of 2 nodes, return those 2 nodes
+	public Node getInput2Nodes()
+	{
+		Node nodeR = null;
+		
+		
+		return nodeR;
+	}
+	
+	
+	//prompt the selection of a single node, return it
+	public Node getInput1Node()
+	{
+		Node nodeR = null;
+		
+		
+		return nodeR;
 	}
 
 	
