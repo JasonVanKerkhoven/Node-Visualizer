@@ -2,7 +2,7 @@
 *Class:             NodeVisualizer.java
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
-*Date of Update:    12/01/2016                                              
+*Date of Update:    15/01/2016                                              
 *Version:           0.3.1                                         
 *                                                                                   
 *Purpose:           Main class and logic for Node Visualizer project.
@@ -11,6 +11,10 @@
 * 
 *Update Log:		v0.3.1
 *						- program can be reset from menubar
+*						- program updated to use new ActionEvent identification
+*						  using action command Strings from NodeUI
+*						- actionPerformed(...) method re-written for improved readability +
+*						  efficiency
 *					v0.3.0
 *						- ui runs on single thread with Node Visualizer now
 *						- event handling for multiple ActionEvents implemented
@@ -47,11 +51,6 @@ public class NodeVisualizer implements ActionListener
 	private static final String UNKNOWN_INPUT_MSG = "Unknown Command";
 	private static final String OP_ERROR_NODE = "Nodes must be entered as 'node#' or '#'.\nWhere # is is any valid integer";
 	
-	//declaring local instance constants
-	private final Object mntmExit, mntmNew;
-	private final Object mntmAddNew, mntmRemove, mntmChangeValue, mntmLink, mntmDelink;
-	private final Object mntmVerboseMode;
-	
 	//declaring local instance variables
 	private NodeUI ui;
 	private Network nodes;
@@ -67,17 +66,6 @@ public class NodeVisualizer implements ActionListener
 		ui = new NodeUI(NAME + VERSION, this, nodes);
 		verbose = false;
 		lastSavedState = 0;
-		
-		this.mntmExit = ui.getMntmExit();
-		this.mntmNew = ui.getMntmNew();
-		
-		this.mntmAddNew = ui.getMntmAddNew();
-		this.mntmChangeValue = ui.getMntmChangeValue();
-		this.mntmDelink = ui.getMntmDelink();
-		this.mntmLink = ui.getMntmLink();
-		this.mntmRemove = ui.getMntmRemove();
-		
-		this.mntmVerboseMode = ui.getMntmVerbose();
 		
 		ui.println("Node Visualizer running...");
 	}
@@ -100,6 +88,72 @@ public class NodeVisualizer implements ActionListener
 		nodes.clear();
 		ui.updateNodeList();
 	}
+	
+	
+	//reset requested
+	private void reqReset()
+	{
+		boolean b = ui.getInputBool(NAME, "Are you sure you want to close the current session?");
+		if (b)
+		{
+			reset();
+		}
+	}
+	
+	
+	//request exit
+	private void reqExit()
+	{
+		//check if file saved
+		if(lastSavedState != nodes.hashCode())
+		{
+			//prompt user to save or exit
+			String options[] = {"Save and Exit", "Exit", "Cancel"};
+			int selected = ui.getInputOptions("Unsaved Work", "You have unsaved data", options, 2);
+			
+			switch(selected)
+			{
+				//Save and Exit
+				case(0):
+					//TODO Save your file
+					exit();
+					break;
+					
+				//Exit w/out saving
+				case(1):
+					exit();
+					break;
+			}
+			
+		}
+	}
+	
+	
+	//add a new node
+	private void addNode()
+	{
+		String toAdd = ui.getInputString("Add Node", "Enter the contents of the new node.");		
+		//check returned string for validity
+		if (toAdd != null)
+		{
+			if (!toAdd.equals(""))
+			{
+				try
+				{
+					nodes.add(toAdd);
+					ui.updateNodeList();
+					return;
+				}
+				catch (NetworkException e)
+				{
+					ui.printError(e.msgTitle, e.getMessage());
+					return;
+				}
+			}
+		}
+		ui.printError("Error", "Value field cannot be left blank");
+	}
+	
 	
 	//check valid form of node input, return plain Integer
 	private Integer toID(String string)
@@ -309,90 +363,61 @@ public class NodeVisualizer implements ActionListener
 	public void actionPerformed(ActionEvent ae) 
 	{
 		//determine source and handle accordingly
-		Object o = ae.getSource();
-		try
+		String cmd = ae.getActionCommand();
+		switch(cmd)
 		{
 			//exit program
-			if (o == this.mntmExit)
-			{
-				exit();
-			}
+			case(NodeUI.MENU_EXIT):
+				reqExit();
+				break;
 			
-			//restart the program to default state
-			else if (o == this.mntmNew)
-			{
-				boolean b = ui.getInputBool(NAME, "Are you sure you want to close the current session?");
 				
-				//check if reset required
-				if (b)
-				{
-					reset();
-				}
-			}
+			//restart the program to default state
+			case(NodeUI.MENU_NEW):
+				reqReset();
+				break;
+			
 			
 			//add a new node via menu bar
-			else if (o == this.mntmAddNew)
-			{
-				if(verbose) ui.println("Node/Add New pressed");
-				String toAdd = ui.getInputString("Add Node", "Enter the contents of the new node.");
-				
-				//check returned string for validity
-				if (toAdd != null)
-				{
-					if (!toAdd.equals(""))
-					{
-						nodes.add(toAdd);
-						ui.updateNodeList();
-						return;
-					}
-				}
-				ui.printError("Error", "Value field cannot be left blank");
-			}
+			case(NodeUI.MENU_ADDNEW):
+				addNode();
+				break;
+			
 			
 			//change the value of a node via menu bar
-			else if (o == this.mntmChangeValue)
-			{
+			case(NodeUI.MENU_CHANGE):
 				//TODO
-				if(verbose) ui.println("Node/Change Value pressed");
-			}
+				break;
+			
 			
 			//delink a node via menu bar
-			else if (o == this.mntmDelink)
-			{
+			case(NodeUI.MENU_DELINK):
 				//TODO
-				if(verbose) ui.println("Node/Delink pressed");
-			}
+				break;
+			
 			
 			//link a node via menu bar
-			else if (o == this.mntmLink)
-			{
+			case(NodeUI.MENU_LINK):
 				//TODO
-				if(verbose) ui.println("Node/Link pressed");
-			}
+				break;
+			
 			
 			//remove a node via menu bar
-			else if (o == this.mntmRemove)
-			{
+			case(NodeUI.MENU_REMOVE):
 				//TODO
-				if(verbose) ui.println("Node/Remove pressed");
-			}
+				break;
 			
-			//toggle verbose mode
-			else if (o == this.mntmVerboseMode)
-			{
-				if(verbose) ui.println("Options/Verbose Mode");
+			
+			//toggle verbose
+			case(NodeUI.MENU_VERBOSE):
 				verbose = ui.getVerbose();
-			}
-			
-			//parse command from cmdline
-			else
-			{
+				break;
+				
+				
+			//otherwise parse cmdline
+			default:
 				handleConsoleInput();
-			}
-		}
-		catch (NetworkException e)
-		{
-			ui.printError(e.msgTitle, e.getMessage());
+				break;		
 		}
 	}
 	

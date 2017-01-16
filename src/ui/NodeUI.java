@@ -2,13 +2,20 @@
 *Class:             NodeException.java
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
-*Date of Update:    12/01/2016                                              
-*Version:           0.3.1                                                      
+*Date of Update:    15/01/2016                                              
+*Version:           0.3.2                                                    
 *                                                                                   
-*Purpose:           UI designed to work with NodeVisualizer.
-*					Only designed to be accessed by a single thread.
+*Purpose:           UI designed to work for NodeVisualizer.java.
+*					Only designed to be accessed by a single thread (not internally synchronized).
+*					Note that while this class points to a Network data type, it NEVER
+*					modifies the Network data.
 * 
-*Update Log:		v0.3.1
+*Update Log:		v0.3.2
+*						- menu tabs are no longer used to ID ActionEvent types
+*						  each tab now has a action command that is stored for identification
+*						- unneeded accessors removed
+*						- method for choosing between multiple options added
+*					v0.3.1
 *						- New tabs added in menu bar
 *						- Method for getting boolean value from a dialog box added
 *					v0.3.0
@@ -66,10 +73,17 @@ import java.awt.Color;
 
 
 public class NodeUI implements KeyListener
-{
+{	
 	//declaring class constants
-	private static final String VERSION = "0.3.0";
-	private static final String WINDOW_TITLE = "Node Visualizer " + VERSION ;
+	public static final String MENU_EXIT = "m/file/exit";
+	public static final String MENU_NEW = "m/file/new";
+	public static final String MENU_ADDNEW = "m/node/add";
+	public static final String MENU_REMOVE = "m/node/remove";
+	public static final String MENU_CHANGE = "m/node/change";
+	public static final String MENU_LINK = "m/node/link";
+	public static final String MENU_DELINK = "m/node/delink";
+	public static final String MENU_VERBOSE = "m/options/verbose";
+	
 	private static final Font DEFAULT_CONSOLE_FONT = new Font("Monospaced", Font.PLAIN, 11);
 	private static final int DEFAULT_WINDOW_X = 1500;
 	private static final int DEFAULT_WINDOW_Y = 800;
@@ -81,12 +95,7 @@ public class NodeUI implements KeyListener
 	private JTextArea consoleOutput;
 	private JPanel drawSpace; 
 	private JTextArea nodeList;
-	//items in "File" tab
-	private JMenuItem mntmExit, mntmNew;
-	//items in "Node" tab
-	private JMenuItem mntmAddNew, mntmRemove, mntmChangeValue, mntmLink, mntmDelink;
-	//items in "Options" tab
-	private JCheckBoxMenuItem mntmVerboseMode;
+	JCheckBoxMenuItem mntmVerboseMode;
 	
 	private CappedBuffer inputBuffer;
 	private Network nodes;
@@ -129,26 +138,35 @@ public class NodeUI implements KeyListener
 		
 		
 		//add menu items to "File" category
-		mntmExit = new JMenuItem("Exit");
-		mntmNew = new JMenuItem("New");
+		JMenuItem mntmExit = new JMenuItem("Exit");
+		JMenuItem mntmNew = new JMenuItem("New");
 		mnFile.add(mntmNew);
 		mnFile.add(mntmExit);
+		
+		mntmExit.setActionCommand(MENU_EXIT);
+		mntmNew.setActionCommand(MENU_NEW);
 		
 		mntmExit.addActionListener(listener);
 		mntmNew.addActionListener(listener);
 		
 		
 		//add menu items to "Node" category
-		mntmAddNew = new JMenuItem("Add New");
-		mntmRemove = new JMenuItem("Remove");
-		mntmChangeValue = new JMenuItem("Change Value");
-		mntmLink = new JMenuItem("Link");
-		mntmDelink = new JMenuItem("Delink");
+		JMenuItem mntmAddNew = new JMenuItem("Add New");
+		JMenuItem mntmRemove = new JMenuItem("Remove");
+		JMenuItem mntmChangeValue = new JMenuItem("Change Value");
+		JMenuItem mntmLink = new JMenuItem("Link");
+		JMenuItem mntmDelink = new JMenuItem("Delink");
 		mnNode.add(mntmAddNew);
 		mnNode.add(mntmRemove);
 		mnNode.add(mntmChangeValue);
 		mnNode.add(mntmLink);
 		mnNode.add(mntmDelink);
+		
+		mntmAddNew.setActionCommand(MENU_ADDNEW);
+		mntmRemove.setActionCommand(MENU_REMOVE);
+		mntmChangeValue.setActionCommand(MENU_CHANGE);
+		mntmLink.setActionCommand(MENU_LINK);
+		mntmDelink.setActionCommand(MENU_DELINK);
 		
 		mntmAddNew.addActionListener(listener);
 		mntmRemove.addActionListener(listener);
@@ -160,6 +178,8 @@ public class NodeUI implements KeyListener
 		//add menu items to "Options" category
 		mntmVerboseMode = new JCheckBoxMenuItem("Verbose/Debug Mode");
 		mnOptions.add(mntmVerboseMode);
+		
+		mntmVerboseMode.setActionCommand(MENU_VERBOSE);
 		
 		mntmVerboseMode.addActionListener(listener);
 		
@@ -219,41 +239,6 @@ public class NodeUI implements KeyListener
 			e.printStackTrace();
 			System.exit(0);
 		}
-	}
-	
-	
-	//generic accessors
-	public Object getMntmExit()
-	{
-		return this.mntmExit;
-	}
-	public Object getMntmNew()
-	{
-		return this.mntmNew;
-	}
-	public Object getMntmAddNew()
-	{
-		return this.mntmAddNew;
-	}
-	public Object getMntmRemove()
-	{
-		return this.mntmRemove;
-	}
-	public Object getMntmChangeValue()
-	{
-		return this.mntmChangeValue;
-	}
-	public Object getMntmLink()
-	{
-		return this.mntmLink;
-	}
-	public Object getMntmDelink()
-	{
-		return this.mntmDelink;
-	}
-	public Object getMntmVerbose()
-	{
-		return this.mntmVerboseMode;
 	}
 	
 	
@@ -420,14 +405,14 @@ public class NodeUI implements KeyListener
 	}
 	
 	
-	//Add New menu item pressed
+	//prompt user to enter a string
 	public String getInputString(String title, String msg)
 	{
 		return JOptionPane.showInputDialog(mainFrame, msg, title, JOptionPane.QUESTION_MESSAGE);
 	}
 	
 	
-	//Prompt the user to answer a yes or no question
+	//prompt the user to answer a yes or no question
 	public boolean getInputBool(String title, String msg)
 	{
 		int i = JOptionPane.showConfirmDialog(mainFrame, msg, title, JOptionPane.YES_NO_OPTION);
@@ -439,6 +424,73 @@ public class NodeUI implements KeyListener
 		else
 		{
 			return false;
+		}
+	}
+	
+	
+	//prompt the user to choice one of n options
+	public int getInputOptions(String title, String msg, String[] options, int defaultOption)
+	{
+		if (options.length <= 3)
+		{
+			//create dialog and get option
+			int selected = JOptionPane.showOptionDialog
+				(
+					mainFrame,
+					msg,
+					title,
+					JOptionPane.YES_NO_CANCEL_OPTION,
+					JOptionPane.QUESTION_MESSAGE,
+					null,
+					options,
+					options[0]
+				);
+
+			//return index option that was pressed
+			/*
+			 * While	JOptionPane.YES_OPTION = 0
+			 * 			JOptionPane.NO_OPTION = 1
+			 * 			JOptionPane.CANCEL_OPTION = 2
+			 * And this case statement is (mostly) unneeded, if the values of these constants
+			 * are changed in a future update of the .swing framework this method will stop
+			 * functioning properly (ie it wont return the index of the option selected)
+			 * Therefore this is added in order to make sure the method functions EVEN if
+			 * Oracle changes the values for the constants used in JOptionPane
+			 */
+			switch(selected)
+			{
+				case(JOptionPane.YES_OPTION):		return 0;
+				case(JOptionPane.NO_OPTION):		return 1;
+				case(JOptionPane.CANCEL_OPTION):	return 2;
+				default:							return defaultOption;
+			}
+		}
+		else
+		{
+			Object selected = JOptionPane.showInputDialog
+				(
+					mainFrame, 
+					msg, 
+					title,
+					JOptionPane.YES_NO_CANCEL_OPTION,
+					null,
+					options,
+					options[0]
+				);
+			
+			//determine which index of options was selected
+			if (selected != null)
+			{
+				String value = (String)selected;
+				for(int i=0; i < options.length; i++)
+				{
+					if(value.equals(options[i]))
+					{
+						return i;
+					}
+				}
+			}
+			return defaultOption;
 		}
 	}
 	
