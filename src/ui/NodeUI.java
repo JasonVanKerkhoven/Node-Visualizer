@@ -15,6 +15,8 @@
 *						  each tab now has a action command that is stored for identification
 *						- unneeded accessors removed
 *						- method for choosing between multiple options added
+*						- method added for selecting 1 node from a list
+*						- save and save as items added into "File" tab in menu bar
 *					v0.3.1
 *						- New tabs added in menu bar
 *						- Method for getting boolean value from a dialog box added
@@ -45,6 +47,7 @@ package ui;
 
 //import packages
 import network.*;
+import ui.dialogs.*;
 
 //import external libraries 
 import javax.swing.JFrame;
@@ -70,18 +73,25 @@ import java.awt.event.KeyListener;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.awt.Color;
+import java.awt.Dimension;
+
+import javax.swing.JTabbedPane;
 
 
 public class NodeUI implements KeyListener
 {	
 	//declaring class constants
-	public static final String MENU_EXIT = "m/file/exit";
 	public static final String MENU_NEW = "m/file/new";
+	public static final String MENU_EXIT = "m/file/exit";
+	public static final String MENU_SAVE = "m/file/save";
+	public static final String MENU_SAVEAS = "m/file/saveas";
+	
 	public static final String MENU_ADDNEW = "m/node/add";
 	public static final String MENU_REMOVE = "m/node/remove";
 	public static final String MENU_CHANGE = "m/node/change";
 	public static final String MENU_LINK = "m/node/link";
 	public static final String MENU_DELINK = "m/node/delink";
+	
 	public static final String MENU_VERBOSE = "m/options/verbose";
 	
 	private static final Font DEFAULT_CONSOLE_FONT = new Font("Monospaced", Font.PLAIN, 11);
@@ -140,14 +150,22 @@ public class NodeUI implements KeyListener
 		//add menu items to "File" category
 		JMenuItem mntmExit = new JMenuItem("Exit");
 		JMenuItem mntmNew = new JMenuItem("New");
+		JMenuItem mntmSave = new JMenuItem("Save");
+		JMenuItem mntmSaveAs = new JMenuItem("Save As");
 		mnFile.add(mntmNew);
+		mnFile.add(mntmSave);
+		mnFile.add(mntmSaveAs);
 		mnFile.add(mntmExit);
 		
 		mntmExit.setActionCommand(MENU_EXIT);
 		mntmNew.setActionCommand(MENU_NEW);
+		mntmSave.setActionCommand(MENU_SAVE);
+		mntmSaveAs.setActionCommand(MENU_SAVEAS);
 		
 		mntmExit.addActionListener(listener);
 		mntmNew.addActionListener(listener);
+		mntmSave.addActionListener(listener);
+		mntmSaveAs.addActionListener(listener);
 		
 		
 		//add menu items to "Node" category
@@ -161,7 +179,7 @@ public class NodeUI implements KeyListener
 		mnNode.add(mntmChangeValue);
 		mnNode.add(mntmLink);
 		mnNode.add(mntmDelink);
-		
+
 		mntmAddNew.setActionCommand(MENU_ADDNEW);
 		mntmRemove.setActionCommand(MENU_REMOVE);
 		mntmChangeValue.setActionCommand(MENU_CHANGE);
@@ -206,6 +224,8 @@ public class NodeUI implements KeyListener
 		consoleInput.setToolTipText("Console Input");
 		consoleInput.setFont(DEFAULT_CONSOLE_FONT);
 		consoleInput.setColumns(10);
+		consoleInput.setMaximumSize(new Dimension(DEFAULT_WINDOW_X, 20));
+		consoleInput.setPreferredSize(null);
 		consoleInput.addActionListener(listener);
 		consoleInput.addKeyListener(this);
 		consolePane.setRightComponent(consoleInput);
@@ -435,16 +455,16 @@ public class NodeUI implements KeyListener
 		{
 			//create dialog and get option
 			int selected = JOptionPane.showOptionDialog
-				(
-					mainFrame,
-					msg,
-					title,
-					JOptionPane.YES_NO_CANCEL_OPTION,
-					JOptionPane.QUESTION_MESSAGE,
-					null,
-					options,
-					options[0]
-				);
+			(
+				mainFrame,
+				msg,
+				title,
+				JOptionPane.YES_NO_CANCEL_OPTION,
+				JOptionPane.QUESTION_MESSAGE,
+				null,
+				options,
+				options[0]
+			);
 
 			//return index option that was pressed
 			/*
@@ -468,15 +488,15 @@ public class NodeUI implements KeyListener
 		else
 		{
 			Object selected = JOptionPane.showInputDialog
-				(
-					mainFrame, 
-					msg, 
-					title,
-					JOptionPane.YES_NO_CANCEL_OPTION,
-					null,
-					options,
-					options[0]
-				);
+			(
+				mainFrame, 
+				msg, 
+				title,
+				JOptionPane.QUESTION_MESSAGE,
+				null,
+				options,
+				options[0]
+			);
 			
 			//determine which index of options was selected
 			if (selected != null)
@@ -495,6 +515,12 @@ public class NodeUI implements KeyListener
 	}
 	
 	
+	public void getInputNodeAndString()
+	{
+		ListAndStringDialog dialog =  new ListAndStringDialog(mainFrame, "TEST", "Should be center");
+	}
+	
+	
 	//Prompt the selection of 2 nodes, return those 2 nodes
 	public Node getInput2Nodes()
 	{
@@ -506,12 +532,25 @@ public class NodeUI implements KeyListener
 	
 	
 	//prompt the selection of a single node, return it
-	public Node getInput1Node()
+	//return null if the user exits or cancels or no node to remove
+	public Node getInput1Node(String title, String msg)
 	{
-		Node nodeR = null;
+		//get a Collection of all Nodes from Network
+		Collection<Node> values = nodes.getNodes();
 		
-		
-		return nodeR;
+		//allow the user to select a node if there are nodes in Network
+		if (values.size() > 0)
+		{
+			Node nodeArr[] = values.toArray(new Node[0]);
+			return (Node)JOptionPane.showInputDialog(mainFrame, msg, title, JOptionPane.QUESTION_MESSAGE, null, nodeArr, nodeArr[0]);
+		}
+		//gives user an empty list to select, always return null
+		else
+		{
+			String[] empty = {""};
+			JOptionPane.showInputDialog(mainFrame, msg, title, JOptionPane.QUESTION_MESSAGE, null, empty, empty[0]);
+			return null;
+		}
 	}
 
 	

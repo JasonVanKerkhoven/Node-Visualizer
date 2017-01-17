@@ -2,15 +2,17 @@
 *Class:             Network.java
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
-*Date of Update:    11/01/2017                                              
-*Version:           1.0.1                                                      
+*Date of Update:    16/01/2017                                              
+*Version:           1.0.2                                                      
 *                                                                                   
 *Purpose:           Controller for a collection of nodes which can be linked to n amount of other nodes.
 *					Nodes are all doubly linked.
 *					Network supports orphaned Nodes (unlinked to anything else in network)
 *
 * 
-*Update Log:		v1.0.1
+*Update Log:		v1.0.2
+*						- accessor for nodes returns Collection<Node> instead of Collection<Object> now
+*					v1.0.1
 *						- remove(...) method changed to fix error during removing
 *						  a node that was linked to itself
 *					v1.0.0
@@ -62,7 +64,7 @@ public class Network
 	
 	
 	//return Collection of all Nodes
-	public Collection getNodes()
+	public Collection<Node> getNodes()
 	{
 		return idMap.values();
 	}
@@ -196,7 +198,7 @@ public class Network
 		{
 			for (int i : keys)
 			{
-				string += "Key: " + i + " || Value: <" + idMap.get(i).toStringSimple() + ">\n";
+				string += "Key: " + i + " || Value: <" + idMap.get(i).toString() + ">\n";
 			}
 		}
 		else

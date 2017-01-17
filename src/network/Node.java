@@ -2,13 +2,16 @@
 *Class:             Node.java
 *Project:           Node Visualizer
 *Author:            Jason Van Kerkhoven                                             
-*Date of Update:    02/01/2016                                              
-*Version:           1.1.0                                                      
+*Date of Update:    16/01/2016                                              
+*Version:           1.1.1                                                      
 *                                                                                   
 *Purpose:           Has links all incoming and outgoing nodes.
 *					Stores a single String.
 * 
-*Update Log:		v1.1.0
+*Update Log:		v1.1.1
+*						- print statements changed so toString() prints simple, toStringDetails()
+*						  prints full
+*					v1.1.0
 *						- restructured to be doubly linked
 *						- contains pointers to all incoming nodes now
 *						- link and delink method now modify the local node and the to-be-linked node
@@ -93,9 +96,8 @@ public class Node
 	}
 	
 	
-	//print a string representation of this node
-	@Override
-	public String toString()
+	//print a detailed string representation of this node
+	public String toStringDetails()
 	{
 		String string = "ID:" + id + "   || '" + value + "' inlinks from node(s) <" ;
 		
@@ -122,10 +124,11 @@ public class Node
 	}
 	
 	
+	@Override
 	//print basic representation of this node
-	public String toStringSimple()
+	public String toString()
 	{
-		return ("Node containing: '" + value +"'");
+		return ("Node " + id + ", [" + value +"]");
 	}
 	
 	

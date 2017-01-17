@@ -71,14 +71,6 @@ public class NodeVisualizer implements ActionListener
 	}
 	
 	
-	//exit program
-	private void exit()
-	{
-		if(verbose) ui.println("Shutdown Acknowledged");
-		System.exit(0);
-	}
-	
-	
 	//total reset
 	private void reset()
 	{	
@@ -115,17 +107,36 @@ public class NodeVisualizer implements ActionListener
 			{
 				//Save and Exit
 				case(0):
-					//TODO Save your file
-					exit();
+					save(false);
+					System.exit(0);
 					break;
 					
 				//Exit w/out saving
 				case(1):
-					exit();
+					System.exit(0);
 					break;
 			}
 			
+		}	
+		//no changes, can exit without confirmation
+		else
+		{
+			System.exit(1);
 		}
+	}
+	
+	
+	//save the file as a .node
+	private void save(boolean saveAsMode)
+	{
+		/*
+		 * TODO
+		 * write the data
+		 */
+		
+		
+		//update the savestate hashcode
+		lastSavedState = nodes.hashCode();
 	}
 	
 	
@@ -152,6 +163,32 @@ public class NodeVisualizer implements ActionListener
 			}
 		}
 		ui.printError("Error", "Value field cannot be left blank");
+	}
+	
+	
+	//remove a node
+	private void removeNode()
+	{
+		Node toRemove = ui.getInput1Node("Remove Node", "Select the node you wish to remove");
+		if (toRemove != null)
+		{
+			try
+			{
+				nodes.remove(toRemove);
+				ui.updateNodeList();
+			}
+			catch (NetworkException e)
+			{
+				ui.printError(e.msgTitle, e.getMessage());
+			}
+		}
+	}
+	
+	
+	//change a node
+	private void changeNode()
+	{
+		ui.getInputNodeAndString();
 	}
 	
 	
@@ -189,7 +226,7 @@ public class NodeVisualizer implements ActionListener
 					//close the program
 					if (input[0].equals("close") || input[0].equals("exit"))
 					{
-						exit();
+						System.exit(0);
 					}
 				
 					//clear console
@@ -371,48 +408,50 @@ public class NodeVisualizer implements ActionListener
 				reqExit();
 				break;
 			
-				
 			//restart the program to default state
 			case(NodeUI.MENU_NEW):
 				reqReset();
+				break;	
+				
+			//save the data
+			case(NodeUI.MENU_SAVE):
+				save(false);
 				break;
 			
+			//save the data, prompt for filename selection/creation
+			case(NodeUI.MENU_SAVEAS):
+				save(true);
+				break;
 			
 			//add a new node via menu bar
 			case(NodeUI.MENU_ADDNEW):
 				addNode();
 				break;
 			
-			
 			//change the value of a node via menu bar
 			case(NodeUI.MENU_CHANGE):
-				//TODO
+				changeNode();
 				break;
-			
 			
 			//delink a node via menu bar
 			case(NodeUI.MENU_DELINK):
 				//TODO
 				break;
 			
-			
 			//link a node via menu bar
 			case(NodeUI.MENU_LINK):
 				//TODO
 				break;
 			
-			
 			//remove a node via menu bar
 			case(NodeUI.MENU_REMOVE):
-				//TODO
+				removeNode();
 				break;
-			
 			
 			//toggle verbose
 			case(NodeUI.MENU_VERBOSE):
 				verbose = ui.getVerbose();
 				break;
-				
 				
 			//otherwise parse cmdline
 			default:
