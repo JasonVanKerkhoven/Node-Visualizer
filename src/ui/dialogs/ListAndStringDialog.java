@@ -33,36 +33,45 @@ import java.awt.Window.Type;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.util.Collection;
 
 import javax.swing.JButton;
 
 
-public class ListAndStringDialog extends JDialog implements ActionListener
+public class ListAndStringDialog<Etype> extends JDialog implements ActionListener
 {
 	//declaring static class variables
-	public static final String BUTTON_OK = "btn/ok";
-	public static final String BUTTON_CANCEL = "btn/cancel";
+	public static final int WINDOW_CLOSE_OPTION = -1;
+	public static final int OK_OPTION = 0;
+	public static final int CANCEL_OPTION = 1;
 	
 	//declaring local instance variables
-	private JFrame localFrame;
+	private Etype element;
+	private String string;
+	private int closeMode;
+	
 	private JTextField inputText;
 	private JList list;
+	private JButton btnOk, btnCancel;
 	
 	
 	//generic constructor
-	public ListAndStringDialog(JFrame mainframe, String windowName, String msg)
+	public ListAndStringDialog(JFrame callingFrame, String windowName, String msg)
 	{
-		super(mainframe, true);
-		setType(Type.POPUP);
+		//set up main window/dialog
+		super(callingFrame, true);
+		this.setType(Type.POPUP);
 		this.setTitle(windowName);
 		this.getContentPane().setLayout(null);
 		this.setBounds(0, 0, 450, 250);
 		
+		//add panel to hold all components
 		JPanel panel = new JPanel();
 		panel.setBounds(0, 0, 434, 212);
 		getContentPane().add(panel);
 		panel.setLayout(null);
 		
+		//add flavor text (msg)
 		JTextField flavorText = new JTextField();
 		flavorText.setHorizontalAlignment(SwingConstants.CENTER);
 		flavorText.setEditable(false);
@@ -73,57 +82,86 @@ public class ListAndStringDialog extends JDialog implements ActionListener
 		flavorText.setColumns(10);
 		flavorText.setBorder(null);
 		
+		//add and set up input text field for user string
 		inputText = new JTextField();
 		inputText.setBounds(224, 100, 200, 20);
-		panel.add(inputText);
+		inputText.addActionListener(this);
 		inputText.setColumns(10);
+		panel.add(inputText);
 		
+		//add scrollpane to hold collection of Etype elements
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(10, 63, 200, 100);
 		panel.add(scrollPane);
 		
+		//add and initialize list to show collection of Etypes
 		//TODO link up nNtwork to this list
 		list = new JList();
 		scrollPane.add(list);
 		
-		JButton btnOk = new JButton("OK");
+		//add okay button
+		btnOk = new JButton("OK");
 		btnOk.setBounds(101, 178, 89, 23);
-		btnOk.setActionCommand(BUTTON_OK);
 		btnOk.addActionListener(this);
 		panel.add(btnOk);
 		
-		JButton btnCancel = new JButton("Cancel");
+		//add cancel button
+		btnCancel = new JButton("Cancel");
 		btnCancel.setBounds(241, 178, 89, 23);
-		btnCancel.setActionCommand(BUTTON_CANCEL);
 		btnCancel.addActionListener(this);
 		panel.add(btnCancel);
 
-		this.setLocationRelativeTo(mainframe);
+		//internal field initialization
+		element = null;
+		string = null;
+		closeMode = WINDOW_CLOSE_OPTION;
+		
+		//make dialog visible
+		this.setLocationRelativeTo(callingFrame);
 		this.setVisible(true);
+	}
+	
+	
+	//generic accessors
+	public String getString()
+	{
+		return string;
+	}
+	public Etype getElement()
+	{
+		return element;
+	}
+	public int getCloseMode()
+	{
+		return closeMode;
+	}
+	
+	
+	//close window
+	public void close()
+	{
+		this.dispose();
 	}
 
 
 	@Override
 	public void actionPerformed(ActionEvent ae) 
 	{
-		String src = ae.getActionCommand();
+		Object src = ae.getSource();
 		
-		//determine which button pressed
-		switch(src)
+		//text field activated OR ok button pressed
+		if (src != btnCancel)
 		{
-			//OK button pressed
-			case(BUTTON_OK):
-				//TODO link this up
-				break;
-			
-			
-			//Cancel button pressed:
-			case(BUTTON_CANCEL):
-				//TODO link this up
-				break;
+			string = inputText.getText();
+			//TODO save list to element;
+			closeMode = OK_OPTION;
 		}
+		else
+		{
+			closeMode = CANCEL_OPTION;
+		}
+		
+		close();
+		
 	}
-	
-	
-	//button li
 }

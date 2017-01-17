@@ -41,6 +41,7 @@ import java.util.ArrayList;
 //import internal packages
 import network.*;
 import ui.*;
+import ui.dialogs.*;
 
 
 public class NodeVisualizer implements ActionListener
@@ -188,7 +189,10 @@ public class NodeVisualizer implements ActionListener
 	//change a node
 	private void changeNode()
 	{
-		ui.getInputNodeAndString();
+		//get information
+		ListAndStringDialogStateWrapper<Node> wrapper =
+		ui.getInputNodeAndString("Change Node Value", "Please select the Node you wish to change, and enter value you wish to change it to.");
+	
 	}
 	
 	

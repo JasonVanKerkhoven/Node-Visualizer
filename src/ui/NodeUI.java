@@ -515,9 +515,19 @@ public class NodeUI implements KeyListener
 	}
 	
 	
-	public void getInputNodeAndString()
+	public ListAndStringDialogStateWrapper<Node> getInputNodeAndString(String title, String msg)
 	{
-		ListAndStringDialog dialog =  new ListAndStringDialog(mainFrame, "TEST", "Should be center");
+		//prompt user for input
+		ListAndStringDialog dialog =  new ListAndStringDialog(mainFrame, title, msg);
+		
+		//save input
+		int closeMode = dialog.getCloseMode();
+		String string = dialog.getString();
+		Node node = (Node)dialog.getElement();
+		
+		//return in wrapper
+		dialog = null;
+		return new ListAndStringDialogStateWrapper<Node>(closeMode, string, node);
 	}
 	
 	
