@@ -2,13 +2,15 @@
 *Class:             Node.java
 *Project:           Node Visualizer
 *Author:            Jason Van Kerkhoven                                             
-*Date of Update:    16/01/2016                                              
-*Version:           1.1.1                                                      
+*Date of Update:    17/01/2016                                              
+*Version:           1.1.2                                                      
 *                                                                                   
 *Purpose:           Has links all incoming and outgoing nodes.
 *					Stores a single String.
 * 
-*Update Log:		v1.1.1
+*Update Log:		v1.1.2
+*						- method added to change value after instantiation
+*					v1.1.1
 *						- print statements changed so toString() prints simple, toStringDetails()
 *						  prints full
 *					v1.1.0
@@ -63,6 +65,21 @@ public class Node
 	public LinkedList<Node> getInLinks()
 	{
 		return inLinks;
+	}
+	
+	
+	//change the value
+	public void setValue(String value) throws NetworkException
+	{
+		if (value != null)
+		{
+			if (value.length() > 0)
+			{
+				this.value = value;
+				return;
+			}
+		}
+		throw new NetworkException("Invalid Value", "Node Error");
 	}
 	
 	

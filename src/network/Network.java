@@ -2,7 +2,7 @@
 *Class:             Network.java
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
-*Date of Update:    16/01/2017                                              
+*Date of Update:    17/01/2017                                              
 *Version:           1.0.2                                                      
 *                                                                                   
 *Purpose:           Controller for a collection of nodes which can be linked to n amount of other nodes.
@@ -10,7 +10,9 @@
 *					Network supports orphaned Nodes (unlinked to anything else in network)
 *
 * 
-*Update Log:		v1.0.2
+*Update Log:		v1.0.3
+*						- methods for changing a current nodes value added (both directly and via ID hash)
+*					v1.0.2
 *						- accessor for nodes returns Collection<Node> instead of Collection<Object> now
 *					v1.0.1
 *						- remove(...) method changed to fix error during removing
@@ -103,6 +105,27 @@ public class Network
 		int id = node.getId();
 		idMap.remove(id);
 		dispatch.retireID(id);
+	}
+	
+	
+	//change the value of a node, based on if
+	public void changeNode(int id, String newValue) throws NetworkException
+	{
+		changeNode(idMap.get(id), newValue);
+	}
+	
+	
+	//change the value of a node in the Network
+	public void changeNode(Node node, String newValue) throws NetworkException
+	{
+		if(node != null)
+		{
+			node.setValue(newValue);
+		}
+		else
+		{
+			throw new NetworkException("Node not found", "Node Error");
+		}
 	}
 	
 	

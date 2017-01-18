@@ -15,19 +15,54 @@
 package ui.dialogs;
 
 
-public class ListAndStringDialogStateWrapper<Etype>
+public class ListAndStringDialogStateWrapper
 { 
 	//data to wrap
 	public final int closeMode;
 	public final String string;
-	public final Etype element;
+	public final Object element;
 	
 	
 	//wrapper constructor
-	public ListAndStringDialogStateWrapper(int closeMode, String string, Etype element)
+	public ListAndStringDialogStateWrapper(int closeMode, String string, Object element)
 	{
 		this.closeMode = closeMode;
 		this.string = string;
 		this.element = element;
+	}
+	
+	
+	@Override
+	//print all contexts
+	public String toString()
+	{
+		String s = ("closeMode: " + closeMode + " || string: ");
+		
+		if(string != null)
+		{
+			if(string.length() > 0)
+			{
+				s += string;
+			}
+			else
+			{
+				s += "<NULL>";
+			}
+		}
+		else
+		{
+			s += "<NULL>";
+		}
+		
+		if (element != null)
+		{
+			s += " || element: " + element.toString();
+		}
+		else
+		{
+			s += " || element: <NULL>";
+		}
+		
+		return s;
 	}
 }

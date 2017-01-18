@@ -3,13 +3,20 @@
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
 *Date of Update:    15/01/2016                                              
-*Version:           0.3.1                                         
+*Version:           0.4.0                                         
 *                                                                                   
 *Purpose:           Main class and logic for Node Visualizer project.
 *					Add nodes, link them, and view.
 * 
 * 
-*Update Log:		v0.3.1
+*Update Log:		v0.4.0
+*						- glitch were error pop-up denoting a value must be non "" would 
+*						  always display if addNode dialog was closed or canceled patched
+*						- removing nodes via menu bar implemented
+*						- changing node values via menu bar implemented
+*						- Exit/Save dialog boxes made clearer
+*						- delinking nodes via menu bar implemented
+*					v0.3.1
 *						- program can be reset from menubar
 *						- program updated to use new ActionEvent identification
 *						  using action command Strings from NodeUI
@@ -47,8 +54,8 @@ import ui.dialogs.*;
 public class NodeVisualizer implements ActionListener
 {
 	//declaring local static class constants
-	private static final String NAME = "Node Visualizer";
-	private static final String VERSION = " v0.3.1";
+	public static final String NAME = "Node Visualizer";
+	public static final String VERSION = " v0.4.0";
 	private static final String UNKNOWN_INPUT_MSG = "Unknown Command";
 	private static final String OP_ERROR_NODE = "Nodes must be entered as 'node#' or '#'.\nWhere # is is any valid integer";
 	
@@ -162,8 +169,11 @@ public class NodeVisualizer implements ActionListener
 					return;
 				}
 			}
+			else
+			{
+				ui.printError("Error", "Value field cannot be left blank");
+			}
 		}
-		ui.printError("Error", "Value field cannot be left blank");
 	}
 	
 	
@@ -190,9 +200,50 @@ public class NodeVisualizer implements ActionListener
 	private void changeNode()
 	{
 		//get information
-		ListAndStringDialogStateWrapper<Node> wrapper =
+		ListAndStringDialogStateWrapper wrapper =
 		ui.getInputNodeAndString("Change Node Value", "Please select the Node you wish to change, and enter value you wish to change it to.");
 	
+		//check for validity
+		if(wrapper.closeMode == ListAndStringDialog.OK_OPTION)
+		{
+			try
+			{
+				nodes.changeNode((Node)wrapper.element, wrapper.string);
+				ui.updateNodeList();
+			}
+			catch (NetworkException e)
+			{
+				ui.printError(e.msgTitle, e.getMessage());
+			}
+		}
+	}
+	
+	
+	//delink a node
+	private void delinkNode()
+	{
+		Node[] inputNodes = ui.getInput2LinkedNodes("Delink Node", "Select the Nodes you wish to delink");
+		if (inputNodes != null)
+		{
+			//check there is a valid selection for both nodes
+			if (inputNodes[0] == null || inputNodes[1] == null)
+			{
+				ui.printError("Delink Error", "You must select both a target node and a node to delink");
+			}
+			else
+			{
+				try
+				{
+					nodes.delink(inputNodes[0], inputNodes[1]);
+					ui.updateNodeList();
+				}
+				catch (NetworkException e)
+				{
+					ui.printError(e.msgTitle, e.getMessage());
+				}
+			}
+		}
+		
 	}
 	
 	
@@ -439,7 +490,7 @@ public class NodeVisualizer implements ActionListener
 			
 			//delink a node via menu bar
 			case(NodeUI.MENU_DELINK):
-				//TODO
+				delinkNode();
 				break;
 			
 			//link a node via menu bar
@@ -455,6 +506,16 @@ public class NodeVisualizer implements ActionListener
 			//toggle verbose
 			case(NodeUI.MENU_VERBOSE):
 				verbose = ui.getVerbose();
+				break;
+			
+			//show help for using menubar
+			case(NodeUI.MENU_TOOLBARHELP):
+				//TODO
+				break;
+			
+			//show help for using console
+			case(NodeUI.MENU_CMDHELP):
+				//TODO
 				break;
 				
 			//otherwise parse cmdline

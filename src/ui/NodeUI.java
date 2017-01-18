@@ -2,15 +2,26 @@
 *Class:             NodeException.java
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
-*Date of Update:    15/01/2016                                              
-*Version:           0.3.2                                                    
+*Date of Update:    17/01/2016                                              
+*Version:           0.4.0                                                    
 *                                                                                   
 *Purpose:           UI designed to work for NodeVisualizer.java.
 *					Only designed to be accessed by a single thread (not internally synchronized).
 *					Note that while this class points to a Network data type, it NEVER
 *					modifies the Network data.
 * 
-*Update Log:		v0.3.2
+*Update Log:		v0.4.0
+*						- custom dialog built for selecting a target node, and a node linked to the target node
+*						  from a list 
+*						  (NodeLinkDialog.java)
+*						- custom dialog built for selecting a node and entering a string
+*						  (ListAndStringDialog.java)
+*						- new dialog types implemented
+*						- method getInput2LinkedNodes(...) added and method getInputNodeAndString(...)
+*						- node/delink and node/change tabs added functionality
+*						- import cleanup
+*						- tabs on console use and toolbar use added to menubar under "Help" category
+*					v0.3.2
 *						- menu tabs are no longer used to ID ActionEvent types
 *						  each tab now has a action command that is stored for identification
 *						- unneeded accessors removed
@@ -51,7 +62,6 @@ import ui.dialogs.*;
 
 //import external libraries 
 import javax.swing.JFrame;
-import javax.swing.JToolBar;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -59,14 +69,10 @@ import javax.swing.JMenu;
 import javax.swing.JSplitPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JFormattedTextField;
-import javax.swing.JTextPane;
 import javax.swing.JTextArea;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JTextField;
 import java.awt.Font;
-import java.awt.EventQueue;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -74,8 +80,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.awt.Color;
 import java.awt.Dimension;
-
-import javax.swing.JTabbedPane;
 
 
 public class NodeUI implements KeyListener
@@ -93,6 +97,9 @@ public class NodeUI implements KeyListener
 	public static final String MENU_DELINK = "m/node/delink";
 	
 	public static final String MENU_VERBOSE = "m/options/verbose";
+	
+	public static final String MENU_CMDHELP = "m/help/cmdhelp";
+	public static final String MENU_TOOLBARHELP = "m/help/toolbarhelp";
 	
 	private static final Font DEFAULT_CONSOLE_FONT = new Font("Monospaced", Font.PLAIN, 11);
 	private static final int DEFAULT_WINDOW_X = 1500;
@@ -200,6 +207,19 @@ public class NodeUI implements KeyListener
 		mntmVerboseMode.setActionCommand(MENU_VERBOSE);
 		
 		mntmVerboseMode.addActionListener(listener);
+		
+		
+		//add menu items to the "Help category
+		JMenuItem mntmCmdHelp = new JMenuItem("Using the toolbar");
+		JMenuItem mntmToolHelp = new JMenuItem("Using the console");
+		mnHelp.add(mntmCmdHelp);
+		mnHelp.add(mntmToolHelp);
+		
+		mntmCmdHelp.setActionCommand(MENU_CMDHELP);
+		mntmToolHelp.setActionCommand(MENU_TOOLBARHELP);
+		
+		mntmCmdHelp.addActionListener(listener);
+		mntmToolHelp.addActionListener(listener);
 		
 		
 		//set up split pane for console objects
@@ -515,10 +535,11 @@ public class NodeUI implements KeyListener
 	}
 	
 	
-	public ListAndStringDialogStateWrapper<Node> getInputNodeAndString(String title, String msg)
+	public ListAndStringDialogStateWrapper getInputNodeAndString(String title, String msg)
 	{
 		//prompt user for input
-		ListAndStringDialog dialog =  new ListAndStringDialog(mainFrame, title, msg);
+		Node[] nodesArr = nodes.getNodes().toArray(new Node[0]);
+		ListAndStringDialog dialog = new ListAndStringDialog(mainFrame, title, msg, nodesArr);
 		
 		//save input
 		int closeMode = dialog.getCloseMode();
@@ -527,17 +548,32 @@ public class NodeUI implements KeyListener
 		
 		//return in wrapper
 		dialog = null;
-		return new ListAndStringDialogStateWrapper<Node>(closeMode, string, node);
+		return new ListAndStringDialogStateWrapper(closeMode, string, node);
 	}
 	
-	
+
 	//Prompt the selection of 2 nodes, return those 2 nodes
-	public Node getInput2Nodes()
+	public Node[] getInput2LinkedNodes(String title, String msg)
 	{
-		Node nodeR = null;
+		//prompt user for input
+		Node[] nodesArr = nodes.getNodes().toArray(new Node[0]);
+		NodeLinkDialog dialog = new NodeLinkDialog(mainFrame, title, msg, nodesArr);
 		
+		//save input
+		Node[] nodes = new Node[2];
+		int closeMode = dialog.getCloseMode();
 		
-		return nodeR;
+		if (closeMode == NodeLinkDialog.OK_OPTION)
+		{
+			nodes[0] = dialog.getNode1();
+			nodes[1] = dialog.getNode2();
+		}
+		else
+		{
+			nodes = null;
+		}
+		
+		return nodes;
 	}
 	
 	
