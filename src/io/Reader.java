@@ -49,7 +49,7 @@ public class Reader
 		//run until buffer is empty
 		while( (b=input.read()) != -1)
 		{
-			input.read
+			b;
 		}
 
 		//close buffer

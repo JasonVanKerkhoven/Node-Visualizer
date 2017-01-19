@@ -1,0 +1,82 @@
+Network .JSON Format Template
+=====================================
+Template models following network:
+
+|--------------------------------|
+|								 |
+|-> Node0 --> Node1 --> Node3 ---|
+		|				 |
+		|---> Node2 ---->|
+
+0:	"the first node"
+1:	"stage 1"
+2:	"stage 2"
+3:	"end node"
+
+<file start below divided>
+=====================================
+{
+	"dispatch" : {
+		"newId" : 10
+		"full" : false
+		retired : {
+			4
+			5
+			6
+			7
+			8
+			9
+		}
+	}
+	
+	"idMap" : {
+		{
+			0, "the first node"
+			1, "stage 1"
+			2, "stage 2"
+			3, "end node"
+		}
+		
+		"key" : 0 {
+			"inLinks" : {
+				3
+				}
+			"outLinks" : {
+				1
+				2
+			}
+		}
+		
+		"key" : 1 {
+			"inLinks" : {
+				0
+			}
+			"outLinks" : {
+				3
+			}
+		}
+		
+		"key" : 2 {
+			"inLinks" : {
+				0
+			}
+			"outLinks" : {
+				3
+			}
+		}
+		
+		"key" : 3 {
+			"inLinks" : {
+				1
+				2
+			}
+			"outLinks" : {
+				0
+			}
+		}
+	}
+}
+
+
+
+

@@ -107,7 +107,7 @@ public class NodeVisualizer implements ActionListener
 	private void reqExit()
 	{
 		//check if file saved
-		if(lastSavedState != nodes.hashCode())
+		if(true)
 		{
 			//prompt user to save or exit
 			String options[] = {"Save and Exit", "Exit", "Cancel"};

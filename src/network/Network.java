@@ -43,14 +43,18 @@ package network;
 
 
 
+//import packages
+import io.*;
+
 //import external libraries
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 
 
-public class Network 
+public class Network implements ToJSONFile
 {
 	//declaring local instance variables
 	IdDispatcher dispatch;
@@ -251,6 +255,28 @@ public class Network
 			string = "No nodes\n";
 		}
 		return string;
+	}
+
+
+	@Override
+	public byte[] toJSON() 
+	{
+		//start prime data block
+		String file = "{\n";
+		
+		//save dispatch object
+		
+		//end prime data block
+		file += "}";
+		return file.getBytes();
+	}
+
+
+	@Override
+	public void fromJSON() throws IOException 
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }
 

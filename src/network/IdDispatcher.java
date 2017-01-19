@@ -18,11 +18,15 @@
 package network;
 
 
+//import packages
+import io.ToJSONFile;
+
+import java.io.IOException;
 //import external libraries
 import java.util.LinkedList;
 
 
-public class IdDispatcher 
+public class IdDispatcher implements ToJSONFile
 {
 	//declaring local instance variables
 	private LinkedList<Integer> retired;
@@ -96,6 +100,29 @@ public class IdDispatcher
 			//add to end
 			retired.addLast((Integer)toAdd);
 		}
+	}
+
+
+	@Override
+	//return object in .json format
+	public byte[] toJSON() 
+	{
+		////start prime data block
+		String file = "{\n";
+		
+		//save dispatch object
+		
+		//end prime data block
+		file += "}";
+		return file.getBytes();
+	}
+
+
+	@Override
+	//return a new instance of this object in the from a .json file
+	public void fromJSON() throws IOException {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	
