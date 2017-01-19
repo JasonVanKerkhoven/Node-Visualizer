@@ -2,7 +2,7 @@
 *Class:             NodeException.java
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
-*Date of Update:    17/01/2016                                              
+*Date of Update:    18/01/2016                                              
 *Version:           0.4.0                                                    
 *                                                                                   
 *Purpose:           UI designed to work for NodeVisualizer.java.
@@ -20,7 +20,8 @@
 *						- method getInput2LinkedNodes(...) added and method getInputNodeAndString(...)
 *						- node/delink and node/change tabs added functionality
 *						- import cleanup
-*						- tabs on console use and toolbar use added to menubar under "Help" category
+*						- tabs on console use and menubar use added to menubar under "Help" category
+*						- method added to return 2 Nodes via dialog box --> getInputTwoNodes(...)
 *					v0.3.2
 *						- menu tabs are no longer used to ID ActionEvent types
 *						  each tab now has a action command that is stored for identification
@@ -574,6 +575,34 @@ public class NodeUI implements KeyListener
 		}
 		
 		return nodes;
+	}
+	
+	
+	//prompt the selection of 2 independent nodes
+	public Node[] getInput2Nodes(String title, String msg)
+	{
+		//get an array of all Nodes in Network
+		Node[] nodeArr = nodes.getNodes().toArray(new Node[0]);;
+		
+		//call dialog
+		TwoListDialog dialog = new TwoListDialog(mainFrame, title, msg, nodeArr, nodeArr);
+		
+		//get values from dialog and check for validity
+		Node[] ret = new Node[2];
+		int closeMode = dialog.getCloseMode();
+		
+		//user entered data
+		if(closeMode == TwoListDialog.OK_OPTION)
+		{
+			ret[0] = (Node)dialog.getElement1();
+			ret[1] = (Node)dialog.getElement2();
+			return ret;
+		}
+		//user canceled or exited window
+		else
+		{
+			return null;
+		}
 	}
 	
 	

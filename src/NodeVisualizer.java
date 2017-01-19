@@ -2,14 +2,16 @@
 *Class:             NodeVisualizer.java
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
-*Date of Update:    15/01/2016                                              
+*Date of Update:    18/01/2016                                              
 *Version:           0.4.0                                         
 *                                                                                   
 *Purpose:           Main class and logic for Node Visualizer project.
 *					Add nodes, link them, and view.
 * 
 * 
-*Update Log:		v0.4.0
+*Update Log:		v0.4.1
+*						- functionality for linking nodes via menu bar implemented
+*					v0.4.0
 *						- glitch were error pop-up denoting a value must be non "" would 
 *						  always display if addNode dialog was closed or canceled patched
 *						- removing nodes via menu bar implemented
@@ -214,6 +216,33 @@ public class NodeVisualizer implements ActionListener
 			catch (NetworkException e)
 			{
 				ui.printError(e.msgTitle, e.getMessage());
+			}
+		}
+	}
+	
+	
+	//link a node
+	private void linkNode()
+	{
+		Node[] inputNodes = ui.getInput2Nodes("Link Nodes", "Select the two nodes you wish to link");
+		if(inputNodes != null)
+		{
+			//check there is valid Node for each entry
+			if (inputNodes[0] == null || inputNodes[1] == null)
+			{
+				ui.printError("Link Error", "You must select both a target node and a node to delink");
+			}
+			else
+			{
+				try
+				{
+					nodes.link(inputNodes[0], inputNodes[1]);
+					ui.updateNodeList();
+				}
+				catch (NetworkException e)
+				{
+					ui.printError(e.msgTitle, e.getMessage());
+				}
 			}
 		}
 	}
@@ -495,7 +524,7 @@ public class NodeVisualizer implements ActionListener
 			
 			//link a node via menu bar
 			case(NodeUI.MENU_LINK):
-				//TODO
+				linkNode();
 				break;
 			
 			//remove a node via menu bar
