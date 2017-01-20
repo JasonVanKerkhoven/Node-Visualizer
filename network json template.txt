@@ -30,13 +30,14 @@ Template models following network:
 	}
 	
 	"idMap" : {
+		"pairing" :
+		{
 			0, "the first node"
 			1, "stage 1"
 			2, "stage 2"
 			3, "end node"
-		}
-		
-		"key" : 0 {
+		}	
+		"node" : 0 : {
 			"inLinks" : {
 				3
 				}
@@ -45,8 +46,7 @@ Template models following network:
 				2
 			}
 		}
-		
-		"key" : 1 {
+		"node" : 1 : {
 			"inLinks" : {
 				0
 			}
@@ -54,8 +54,7 @@ Template models following network:
 				3
 			}
 		}
-		
-		"key" : 2 {
+		"node" : 2 : {
 			"inLinks" : {
 				0
 			}
@@ -63,8 +62,7 @@ Template models following network:
 				3
 			}
 		}
-		
-		"key" : 3 {
+		"node" : 3 : {
 			"inLinks" : {
 				1
 				2
