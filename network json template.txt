@@ -30,7 +30,6 @@ Template models following network:
 	}
 	
 	"idMap" : {
-		{
 			0, "the first node"
 			1, "stage 1"
 			2, "stage 2"

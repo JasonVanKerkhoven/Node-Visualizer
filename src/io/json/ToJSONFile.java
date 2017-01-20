@@ -11,17 +11,17 @@
 *Update Log:		v1.0.0
 *						- null
 */
-package io;
+package io.json;
 
 
 //imports
 import java.io.IOException;
 
 
-public interface ToJSONFile 
+public interface ToJSONFile
 {
 	//write
-	public byte[] toJSON();
+	public JsonFile toJSON(String baseOffset);
 	
 	//read
 	public void fromJSON() throws IOException;

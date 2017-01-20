@@ -8,7 +8,12 @@
 *Purpose:           Gives the next valid ID address up to 2^32-1.
 *					If you exceed the limit it will throw an exception and god help you.
 * 
-*Update Log:		v1.0.1
+*Update Log:		v1.1.1
+*						- locally declared class moved to io.json.ToJSON
+*					v1.1.0
+*						- method added for saving instance information as .json
+*						- helper class declared in toJSON() method
+*					v1.0.1
 *						- bug patch for retire(int i) method
 *					v1.0.0
 *						- reset added
@@ -17,13 +22,12 @@
 */
 package network;
 
-
 //import packages
-import io.ToJSONFile;
+import io.json.*;
 
-import java.io.IOException;
 //import external libraries
 import java.util.LinkedList;
+import java.io.IOException;
 
 
 public class IdDispatcher implements ToJSONFile
@@ -105,16 +109,30 @@ public class IdDispatcher implements ToJSONFile
 
 	@Override
 	//return object in .json format
-	public byte[] toJSON() 
+	public JsonFile toJSON(String baseOffset) 
 	{
-		////start prime data block
-		String file = "{\n";
+		//Set up controller and prime data block
+		JsonFile file = new JsonFile(baseOffset);
+		file.newBlock();
 		
-		//save dispatch object
+		//save newId
+		file.addField("newId", newId);
 		
-		//end prime data block
-		file += "}";
-		return file.getBytes();
+		//save full
+		file.addField("full", full);
+		
+		//save block, list of retired IDs
+		file.addField("retried", "");
+		file.newBlock();
+		for(int value : retired)
+		{
+			file.add(value + "\n");
+		}
+		file.endBlock();
+		
+		//end prime data block and return
+		file.endBlock();
+		return file;
 	}
 
 
@@ -124,6 +142,12 @@ public class IdDispatcher implements ToJSONFile
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
+	
+	
+	
+	
 	
 	
 	/*

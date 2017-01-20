@@ -44,7 +44,7 @@ package network;
 
 
 //import packages
-import io.*;
+import io.json.*;
 
 //import external libraries
 import java.util.HashMap;
@@ -259,24 +259,74 @@ public class Network implements ToJSONFile
 
 
 	@Override
-	public byte[] toJSON() 
+	public JsonFile toJSON(String baseOffset)
 	{
-		//start prime data block
-		String file = "{\n";
+		//Set up controller and prime data block
+		JsonFile file = new JsonFile(baseOffset);
+		file.newBlock();
 		
-		//save dispatch object
+		//save dispatch
+		JsonFile dispatchJson = dispatch.toJSON(file.getNetOffset());
+		file.addField("dispatch", dispatchJson);
 		
-		//end prime data block
-		file += "}";
-		return file.getBytes();
+		//save basic idMap
+		file.addField("idMap", "");
+		file.newBlock();
+		//iterate through all keys
+		Set<Integer> keySet = idMap.keySet();
+		for (int key : keySet)
+		{
+			String nodeValue = idMap.get(key).getValue();
+			file.addPairing(key, nodeValue);
+		}
+		file.endBlock();
+		
+		//save link details, node
+		Collection<Node> allNodes = idMap.values();
+		//iterate through all nodes									//TODO fix the tabbing errors
+		for (Node node : allNodes)
+		{
+			//set up json file for node
+			JsonFile nodeJson = new JsonFile(file.getNetOffset());
+			nodeJson.add("\"key\" : " + node.getId() + " ");
+			nodeJson.newBlock();
+			
+			//set up inLinks block
+			nodeJson.addField("inLinks", "");
+			nodeJson.newBlock();
+			for(Node inLinkNode : node.getInLinks())
+			{
+				nodeJson.add(inLinkNode.getId() + "\n");
+			}
+			nodeJson.endBlock();
+			
+			//set up outLinks block
+			nodeJson.addField("outLinks", "");
+			nodeJson.newBlock();
+			for(Node inLinkNode : node.getOutLinks())
+			{
+				nodeJson.add(inLinkNode.getId() + "\n");
+			}
+			nodeJson.endBlock();
+			
+			//end object and add to main json file
+			nodeJson.endBlock();
+			file.add(nodeJson.toString());
+		}
+		
+		
+		
+		
+		
+		//end prime data block and return
+		return file;
 	}
 
 
 	@Override
 	public void fromJSON() throws IOException 
 	{
-		// TODO Auto-generated method stub
-		
+		// TODO
 	}
 }
 
