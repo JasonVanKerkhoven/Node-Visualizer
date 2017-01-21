@@ -37,16 +37,16 @@ Template models following network:
 			2, "stage 2"
 			3, "end node"
 		}	
-		"node" : 0 : {
+		"node 0" : {
 			"inLinks" : {
 				3
-				}
+			}
 			"outLinks" : {
 				1
 				2
 			}
 		}
-		"node" : 1 : {
+		"node 1" : {
 			"inLinks" : {
 				0
 			}
@@ -54,7 +54,7 @@ Template models following network:
 				3
 			}
 		}
-		"node" : 2 : {
+		"node 2" : {
 			"inLinks" : {
 				0
 			}
@@ -62,7 +62,7 @@ Template models following network:
 				3
 			}
 		}
-		"node" : 3 : {
+		"node 3" : {
 			"inLinks" : {
 				1
 				2

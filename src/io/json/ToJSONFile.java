@@ -24,5 +24,8 @@ public interface ToJSONFile
 	public JsonFile toJSON(String baseOffset);
 	
 	//read
-	public void fromJSON() throws IOException;
+	public void fromJSON(String JsonFile) throws JsonException;
+	
+	//read
+	public void fromJSON(byte[] JsonFile) throws JsonException;
 }

@@ -2,10 +2,11 @@
 *Class:             ToJSONFile.java
 *Project:           Node Visualizer
 *Author:            Jason Van Kerkhoven                                             
-*Date of Update:    19/01/2016                                              
+*Date of Update:    20/01/2016                                              
 *Version:           1.1.0                                                      
 *                                                                                   
 *Purpose:           Helper class to assemble a .json file as a String
+*					Basically a controller to help structure a .json file.
 * 
 *Update Log:		v1.1.0
 *						- minor fix with bracket positioning
@@ -116,10 +117,24 @@ public class JsonFile
 	}
 	
 	
-	//controlled raw concatenation
+	//controlled raw new line add
 	public void add(String toAdd)
 	{
 		file += base + offset + toAdd;
+	}
+	
+	
+	//add a cosmetic spacer
+	public void addln()
+	{
+		file += "\n";
+	}
+	
+	
+	//uncontrolled raw concatination
+	public void addRaw(String toAdd)
+	{
+		file += toAdd;
 	}
 	
 	
@@ -127,6 +142,14 @@ public class JsonFile
 	public void newBlock()
 	{
 		file += "{\n";
+		offset += "\t";
+	}
+	
+	
+	//new block, but with field name
+	public void newBlock(String fieldName)
+	{
+		file += "\"" + fieldName + "\" : {\n";
 		offset += "\t";
 	}
 	
@@ -145,8 +168,9 @@ public class JsonFile
 		return file.getBytes();
 	}
 	
+	
 	@Override
-	//return the JsonFile as a String
+	//return the JsonFile as a plain String
 	public String toString()
 	{
 		return file;

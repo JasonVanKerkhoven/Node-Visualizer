@@ -12,6 +12,7 @@
 * 
 *Update Log:		v1.0.3
 *						- methods for changing a current nodes value added (both directly and via ID hash)
+*						- toJSON(...) method implemented
 *					v1.0.2
 *						- accessor for nodes returns Collection<Node> instead of Collection<Object> now
 *					v1.0.1
@@ -257,8 +258,15 @@ public class Network implements ToJSONFile
 		return string;
 	}
 
-
+	
+	//convert the instance nto a .json format, no initial tab offset
+	public JsonFile toJSON()
+	{
+		return toJSON(null);
+	}
+	
 	@Override
+	//convert the instance into a .json format
 	public JsonFile toJSON(String baseOffset)
 	{
 		//Set up controller and prime data block
@@ -272,7 +280,10 @@ public class Network implements ToJSONFile
 		//save basic idMap
 		file.addField("idMap", "");
 		file.newBlock();
+		
 		//iterate through all keys
+		file.addField("pairings", "");
+		file.newBlock();
 		Set<Integer> keySet = idMap.keySet();
 		for (int key : keySet)
 		{
@@ -283,50 +294,57 @@ public class Network implements ToJSONFile
 		
 		//save link details, node
 		Collection<Node> allNodes = idMap.values();
-		//iterate through all nodes									//TODO fix the tabbing errors
+		//iterate through all nodes
 		for (Node node : allNodes)
 		{
-			//set up json file for node
+			//initialize blank JsonFile for node
 			JsonFile nodeJson = new JsonFile(file.getNetOffset());
-			nodeJson.add("\"key\" : " + node.getId() + " ");
 			nodeJson.newBlock();
 			
-			//set up inLinks block
+			//add inLink block
 			nodeJson.addField("inLinks", "");
 			nodeJson.newBlock();
-			for(Node inLinkNode : node.getInLinks())
+			for(Node n: node.getInLinks())
 			{
-				nodeJson.add(inLinkNode.getId() + "\n");
+				nodeJson.add(n.getId()+"\n");
 			}
 			nodeJson.endBlock();
 			
-			//set up outLinks block
+			//add outlink block
 			nodeJson.addField("outLinks", "");
 			nodeJson.newBlock();
-			for(Node inLinkNode : node.getOutLinks())
+			for (Node n: node.getOutLinks())
 			{
-				nodeJson.add(inLinkNode.getId() + "\n");
+				nodeJson.add(n.getId()+"\n");
 			}
 			nodeJson.endBlock();
 			
-			//end object and add to main json file
+			//end prime block and add to main JsonFile
 			nodeJson.endBlock();
-			file.add(nodeJson.toString());
+			String fieldName = "node " + node.getId();
+			file.addField(fieldName, nodeJson);
 		}
 		
-		
-		
-		
+		//end idMap block
+		file.endBlock();
 		
 		//end prime data block and return
+		file.endBlock();
 		return file;
 	}
 
 
 	@Override
-	public void fromJSON() throws IOException 
+	public void fromJSON(String JsonFile) throws JsonException 
 	{
 		// TODO
+	}
+
+
+	@Override
+	public void fromJSON(byte[] JsonFile) throws JsonException {
+		// TODO Auto-generated method stub
+		
 	}
 }
 

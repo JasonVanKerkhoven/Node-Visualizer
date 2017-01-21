@@ -7,7 +7,9 @@
 *                                                                                   
 *Purpose:           Generic exception
 * 
-*Update Log:		v1.0.0
+*Update Log:		v1.0.1
+*						- toString method fixed
+*					v1.0.0
 *						- null
 */
 package network;
@@ -39,6 +41,6 @@ public class NetworkException extends Exception
 	//return a string representation (almost exclusively used for debug)
 	public String toString()
 	{
-		return ("GraphException: " + msgTitle + ", " + this.getMessage() + " (critical=" + criticalFlag + ")");
+		return ("NetworkException: " + msgTitle + ", " + this.getMessage() + " (critical=" + criticalFlag + ")");
 	}
 }

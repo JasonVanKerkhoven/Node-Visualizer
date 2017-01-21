@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 //imports from local packages
 import io.*;
+import io.json.JsonException;
 import io.json.JsonFile;
 import network.*;
 
@@ -49,6 +50,7 @@ public class JsonTestBench
 	public static void main(String[] args)
 	{
 		//working instance variables
+		JsonFile jsonFileNetwork, jsonFileId;
 		String expected;
 		IdDispatcher dispatch = new IdDispatcher();
 		Network network = new Network();
@@ -84,7 +86,8 @@ public class JsonTestBench
 		}
 		
 		//convert to .json and print
-		printJson("idDispatcher", dispatch.toJSON(""));
+		jsonFileId = dispatch.toJSON(null);
+		printJson("idDispatcher", jsonFileId);
 		
 		
 		
@@ -123,9 +126,10 @@ public class JsonTestBench
 		println("}");
 		
 		
+		
 		//test to .json for IdDispatcher
 		////////////////////////////////////////////////////////////////////////////////////////////
-		println("Initializing Network values..." + DIV);
+		println("\n\nInitializing Network values..." + DIV);
 		try
 		{
 			//add nodes
@@ -157,7 +161,36 @@ public class JsonTestBench
 			System.exit(0);
 		}
 		
-		printJson("network", network.toJSON(null));
+		jsonFileNetwork = network.toJSON();
+		printJson("network", jsonFileNetwork);
+		
+		
+		
+		//test from .json for IdDispatcher
+		////////////////////////////////////////////////////////////////////////////////////////////
+		println("\n\nBuilding object..." + DIV);
+		IdDispatcher builtDispatch = new IdDispatcher();
+		
+		try
+		{
+			builtDispatch.fromJSON(jsonFileId.toString());
+			print(builtDispatch.toJSON(null).toString());
+		}
+		catch (JsonException e)
+		{
+			print(e.toString());
+			System.exit(0);
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		print("\n\n\n-- end");
 	}
 
 }

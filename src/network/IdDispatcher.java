@@ -3,12 +3,14 @@
 *Project:           Node Visualizer
 *Author:            Jason Van Kerkhoven                                             
 *Date of Update:    28/12/2016                                              
-*Version:           1.0.0                                                      
+*Version:           1.2.0                                                      
 *                                                                                   
 *Purpose:           Gives the next valid ID address up to 2^32-1.
 *					If you exceed the limit it will throw an exception and god help you.
 * 
-*Update Log:		v1.1.1
+*Update Log:		v1.2.0
+*						- objects can now be converted to .json --> toJSON(...)
+*						- objects can now be built from .json --> fromJSON(...)
 *						- locally declared class moved to io.json.ToJSON
 *					v1.1.0
 *						- method added for saving instance information as .json
@@ -122,7 +124,7 @@ public class IdDispatcher implements ToJSONFile
 		file.addField("full", full);
 		
 		//save block, list of retired IDs
-		file.addField("retried", "");
+		file.addField("retired", "");
 		file.newBlock();
 		for(int value : retired)
 		{
@@ -138,9 +140,141 @@ public class IdDispatcher implements ToJSONFile
 
 	@Override
 	//return a new instance of this object in the from a .json file
-	public void fromJSON() throws IOException {
-		// TODO Auto-generated method stub
+	public void fromJSON(String JsonFile) throws JsonException 
+	{
+		//declaring method variables
+		int blockCount = 0;
+		int line = 0;
 		
+		//make sure this instance is in its default state
+		this.reset();
+		
+		//split at newlines, remove all tabs, remove spaces
+		JsonFile = JsonFile.replaceAll("\t", "");
+		JsonFile = JsonFile.replaceAll(" ", "");
+		String[] fileLine = JsonFile.split("\n");
+		
+		//make sure there is a starting block
+		if (!fileLine[line].equals("{"))
+		{
+			throw new JsonException("No starting block", JsonException.ERR_FORMAT);
+		}
+		line++;
+		
+		
+		//check newId
+		if ( fileLine[line].contains("\"newId\":"))
+		{
+			//check there is a value after the colon
+			String[] newId = fileLine[line].split(":");
+			if (newId.length == 2)
+			{
+				//save value to newId field
+				try
+				{
+					this.newId = Integer.parseInt(newId[1]);
+				}
+				catch (NumberFormatException e)
+				{
+					throw new JsonException("newId value not a valid int", JsonException.ERR_BAD_VALUE);
+				}
+			}
+			else
+			{
+				throw new JsonException("newId value not found", JsonException.ERR_BAD_VALUE);
+			}
+		}
+		else
+		{
+			throw new JsonException("newId field not found", JsonException.ERR_BAD_FIELD);
+		}
+		line++;
+		
+		
+		//check full
+		if ( fileLine[line].contains("\"full\":") )
+		{
+			//confirm there is a value after the colon
+			String[] full = fileLine[line].split(":");
+			if (full.length == 2)
+			{
+				//save value to full field
+				if(full[1].equals("true"))
+				{
+					this.full = true;
+				}
+				else if (full[1].equals("false"))
+				{
+					this.full = false;
+				}
+				else
+				{
+					throw new JsonException("full value invalid - must be boolean", JsonException.ERR_BAD_VALUE);
+				}
+			}
+			else
+			{
+				throw new JsonException("full value not found", JsonException.ERR_BAD_VALUE);
+			}
+		}
+		else
+		{
+			throw new JsonException("full field not found", JsonException.ERR_BAD_FIELD);
+		}
+		line++;
+		
+		
+		//check retired block start
+		if(!fileLine[line].contains("\"retired\":{"))
+		{
+			throw new JsonException("retired field not found", JsonException.ERR_BAD_FIELD);
+		}
+		line++;
+		blockCount++;
+		
+		
+		//get data from retired block
+		while ( !fileLine[line].contains("}"))
+		{
+			//add to list of retired IDs
+			try
+			{
+				int toRetire = Integer.parseInt(fileLine[line]);
+				this.retireID(toRetire);
+			}
+			catch (NumberFormatException e)
+			{
+				throw new JsonException("retired value invalid - must be integer", JsonException.ERR_BAD_VALUE);
+			}
+			line++;
+		}
+		blockCount--;
+		line++;
+		
+		//check for termination of prime block
+		if (!fileLine[line].equals("}"))
+		{
+			throw new JsonException("No end block", JsonException.ERR_FORMAT);
+		}
+	}
+
+
+	@Override
+	public void fromJSON(byte[] rawBytes) throws JsonException 
+	{
+		/* TODO there must be a better way to do this
+		 * using char array so as i dont need to make a new string each char add (each string is immutable)
+		 */
+
+		//cast each byte as a char
+		char[] brokenString = new char[rawBytes.length];
+		for(int i=0; i < rawBytes.length; i++)
+		{
+			brokenString[i] = (char)rawBytes[i];
+		}
+		
+		//generate object from json file, now in String form
+		fromJSON(new String(brokenString));
 	}
 	
 	
