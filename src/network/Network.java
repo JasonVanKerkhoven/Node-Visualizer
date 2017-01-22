@@ -3,7 +3,7 @@
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
 *Date of Update:    17/01/2017                                              
-*Version:           1.0.2                                                      
+*Version:           1.0.3                                                      
 *                                                                                   
 *Purpose:           Controller for a collection of nodes which can be linked to n amount of other nodes.
 *					Nodes are all doubly linked.
@@ -265,6 +265,7 @@ public class Network implements ToJSONFile
 		return toJSON(null);
 	}
 	
+	
 	@Override
 	//convert the instance into a .json format
 	public JsonFile toJSON(String baseOffset)
@@ -335,15 +336,160 @@ public class Network implements ToJSONFile
 
 
 	@Override
+	//built Network object from .json
 	public void fromJSON(String JsonFile) throws JsonException 
 	{
-		// TODO
+		//declaring method variables
+		int line = 0;
+		
+		//make sure this instance is in its default state
+		this.clear();
+		
+		//split at newlines, remove all tabs, remove spaces
+		JsonFile = JsonFile.replaceAll("\t", "");
+		JsonFile = JsonFile.replaceAll(" ", "");
+		String[] fileLine = JsonFile.split("\n");
+		
+		//make sure there is a starting block
+		if (!fileLine[line].equals("{"))
+		{
+			throw new JsonException("No starting block", JsonException.ERR_FORMAT);
+		}
+		line++;
+		
+		//check for dispatch
+		if (fileLine[line].equals("\"dispatch\":{"))
+		{
+			line++;
+			String dispatchJson = "{\n";
+			int block = 0;
+			
+			//isolate dispatch json
+			while (! (fileLine[line].equals("}") && block == 0) )
+			{
+				if(fileLine[line].contains("{"))
+				{
+					block++;
+				}
+				else if (fileLine[line].contains("}"))
+				{
+					block--;
+				}
+				dispatchJson += fileLine[line] + "\n";
+				line++;
+			}
+			dispatchJson += fileLine[line] +"\n";
+			line++;
+			
+			//build dispatch
+			this.dispatch.fromJSON(dispatchJson);
+		}
+		else
+		{
+			throw new JsonException("dispatch object not found", JsonException.ERR_BAD_FIELD);
+		}
+		
+		
+		//check idMap block
+		if(fileLine[line].equals("\"idMap\":{"))
+		{
+			line++;
+			//check pairings block
+			if(fileLine[line].equals("\"pairings\":{"))
+			{
+				line++;
+				
+				//get all pairings
+				while(!fileLine[line].equals("}"))
+				{
+					//remove quotes, split at ","
+					if (!fileLine[line].contains("\"")) throw new JsonException("Invalid format for pairing value -- must be String", JsonException.ERR_BAD_VALUE);
+					String[] pair = fileLine[line].replaceAll("\"", "").split(",");
+					
+					//make sure there are only 2 pairs
+					if (pair.length == 2)
+					{
+						try
+						{
+							//parse info
+							int id = Integer.parseInt(pair[0]);
+							String value = pair[1];
+							
+							//create node with id and add
+							Node node = new Node(value, id);
+							this.idMap.put(id, node);
+						}
+						catch (NumberFormatException e)
+						{
+							throw new JsonException("Pairing information id invalid -- must be of type integer", JsonException.ERR_BAD_VALUE);
+						}
+					}
+					else
+					{
+						throw new JsonException("Pairing information for idMap invalid", JsonException.ERR_FORMAT);
+					}
+					
+					line++;
+				}
+			}
+			else
+			{
+				throw new JsonException("Pairing information for idMap not found", JsonException.ERR_BAD_FIELD);
+			}
+		}
+		else
+		{
+			throw new JsonException("idMap object not found", JsonException.ERR_BAD_FIELD);
+		}
+		line++;
+		
+		
+		//check for node link blocks until file end
+		int block = 2;		//we need one } to exit the idMap block and one } to end the file block
+		while (block > 0)
+		{
+			//check for starting sub-block denoting which node
+			if(fileLine[line].contains("{"))
+			{
+				block++;
+				
+				int currentNode;
+				
+				//isolate node id and convert to int
+				String filteredLine = fileLine[line].replaceAll("\"node", "");
+				filteredLine = filteredLine.replaceAll("\":{", "");
+				try
+				{
+					currentNode = Integer.parseInt(filteredLine);
+				}
+				catch (NumberFormatException e)
+				{
+					throw new JsonException("Node id invalid -- must be of type integer", JsonException.ERR_BAD_VALUE);
+				}
+				
+				//TODO check and set inLinks/outLinks
+			}
+		}
 	}
 
 
 	@Override
-	public void fromJSON(byte[] JsonFile) throws JsonException {
-		// TODO Auto-generated method stub
+	//build Network object from .json
+	public void fromJSON(byte[] rawBytes) throws JsonException 
+	{
+		/* TODO there must be a better way to do this
+		 * using char array so as i dont need to make a new string each char add (each string is immutable)
+		 */
+
+		//cast each byte as a char
+		char[] brokenString = new char[rawBytes.length];
+		for(int i=0; i < rawBytes.length; i++)
+		{
+			brokenString[i] = (char)rawBytes[i];
+		}
+		
+		//generate object from json file, now in String form
+		fromJSON(new String(brokenString));
 		
 	}
 }

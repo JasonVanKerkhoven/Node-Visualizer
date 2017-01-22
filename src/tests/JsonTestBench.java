@@ -40,13 +40,6 @@ public class JsonTestBench
 		System.out.print(printable);
 	}
 	
-	
-	public static void printJson(String name, JsonFile json)
-	{
-		System.out.println("\n------------ " + name + ".json ------------\n" + json.toString() + "\n-----------------------------\n\n");
-	}
-	
-	
 	public static void main(String[] args)
 	{
 		//working instance variables
@@ -87,7 +80,7 @@ public class JsonTestBench
 		
 		//convert to .json and print
 		jsonFileId = dispatch.toJSON(null);
-		printJson("idDispatcher", jsonFileId);
+		println("-------start-------\n" + jsonFileId.toString() + "\n-----------end----------");
 		
 		
 		
@@ -162,19 +155,43 @@ public class JsonTestBench
 		}
 		
 		jsonFileNetwork = network.toJSON();
-		printJson("network", jsonFileNetwork);
+		println("---------start---------" + jsonFileNetwork.toString() + "-----------end------------");
 		
 		
 		
 		//test from .json for IdDispatcher
 		////////////////////////////////////////////////////////////////////////////////////////////
-		println("\n\nBuilding object..." + DIV);
+		println("\n\nTesting idDispatcher.java from .json..." + DIV);
 		IdDispatcher builtDispatch = new IdDispatcher();
 		
 		try
 		{
+			//build from json
+			println("Building object...");
 			builtDispatch.fromJSON(jsonFileId.toString());
+			println("Object built!");
+			println("Printing diagnostics...");
+
+			//print json used
+			println("\n.json file used\n-----------------------");
+			print(jsonFileId.toString());
+			println("-------------------------");
+			
+			//print json of object built
+			println("\n.json file of built object\n-----------------------");
 			print(builtDispatch.toJSON(null).toString());
+			println("-------------------------");
+
+			//compare (they should be equal)
+			println("Comparing .json files of built object and origianl .json file (files should match)...");
+			if(jsonFileId.toString().equals(builtDispatch.toJSON(null).toString()))
+			{
+				println("PASS! -- Encoding correct!");
+			}
+			else
+			{
+				println("FAIL! -- Encoding failed!");
+			}
 		}
 		catch (JsonException e)
 		{
@@ -184,8 +201,45 @@ public class JsonTestBench
 		
 		
 		
+		//test from .json for Network
+		////////////////////////////////////////////////////////////////////////////////////////////
+		println("\n\nTesting idDispatcher.java from .json..." + DIV);
+		Network builtNetwork = new Network();
 		
-		
+		try
+		{
+			//build from json
+			println("Building object...");
+			builtNetwork.fromJSON(jsonFileNetwork.toString());
+			println("Object built!");
+			println("Printing diagnostics...");
+			
+			//print json used
+			println("\n.json file used\n-----------------------");
+			print(jsonFileNetwork.toString());
+			println("-------------------------");
+			
+			//print json of object built
+			println("\n.json file of built object\n-----------------------");
+			print(builtNetwork.toJSON().toString());
+			println("-------------------------");
+
+			//compare (they should be equal)
+			println("Comparing .json files of built object and origianl .json file (files should match)...");
+			if(jsonFileNetwork.toString().equals(builtNetwork.toJSON().toString()))
+			{
+				println("PASS! -- Encoding correct!");
+			}
+			else
+			{
+				println("FAIL! -- Encoding failed!");
+			}
+		}
+		catch (JsonException e)
+		{
+			print(e.toString());
+			System.exit(0);
+		}
 		
 		
 		
