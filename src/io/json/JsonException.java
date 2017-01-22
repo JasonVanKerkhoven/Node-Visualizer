@@ -31,7 +31,7 @@ public class JsonException extends Exception
 	//no-title constructor
 	public JsonException(String errorMsg, int errorCode)
 	{
-		this(errorMsg, ".json Exception", errorCode);
+		this(errorMsg, "JsonException", errorCode);
 	}
 	
 	//generic constructor
@@ -47,6 +47,6 @@ public class JsonException extends Exception
 	@Override
 	public String toString()
 	{
-		return ("Error Code: " + errorCode + ", msg = \"" + this.getMessage() + "\", title = \"" + "\"");
+		return ("Error Code: " + errorCode + ", msg = \"" + this.getMessage() + "\", title = \"" + title + "\"");
 	}
 }

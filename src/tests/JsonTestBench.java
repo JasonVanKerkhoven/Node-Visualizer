@@ -155,7 +155,7 @@ public class JsonTestBench
 		}
 		
 		jsonFileNetwork = network.toJSON();
-		println("---------start---------" + jsonFileNetwork.toString() + "-----------end------------");
+		println("---------start---------\n" + jsonFileNetwork.toString() + "\n-----------end------------");
 		
 		
 		
@@ -203,7 +203,7 @@ public class JsonTestBench
 		
 		//test from .json for Network
 		////////////////////////////////////////////////////////////////////////////////////////////
-		println("\n\nTesting idDispatcher.java from .json..." + DIV);
+		println("\n\nTesting Network.java from .json..." + DIV);
 		Network builtNetwork = new Network();
 		
 		try
@@ -212,33 +212,34 @@ public class JsonTestBench
 			println("Building object...");
 			builtNetwork.fromJSON(jsonFileNetwork.toString());
 			println("Object built!");
-			println("Printing diagnostics...");
-			
-			//print json used
-			println("\n.json file used\n-----------------------");
-			print(jsonFileNetwork.toString());
-			println("-------------------------");
-			
-			//print json of object built
-			println("\n.json file of built object\n-----------------------");
-			print(builtNetwork.toJSON().toString());
-			println("-------------------------");
-
-			//compare (they should be equal)
-			println("Comparing .json files of built object and origianl .json file (files should match)...");
-			if(jsonFileNetwork.toString().equals(builtNetwork.toJSON().toString()))
-			{
-				println("PASS! -- Encoding correct!");
-			}
-			else
-			{
-				println("FAIL! -- Encoding failed!");
-			}
 		}
 		catch (JsonException e)
 		{
-			print(e.toString());
-			System.exit(0);
+			println("Error building object");
+			println(e.toString());
+		}
+		
+		println("Printing diagnostics...");
+		
+		//print json used
+		println("\n.json file used\n-----------------------");
+		print(jsonFileNetwork.toString());
+		println("-------------------------");
+		
+		//print json of object built
+		println("\n.json file of built object\n-----------------------");
+		print(builtNetwork.toJSON().toString());
+		println("-------------------------");
+
+		//compare (they should be equal)
+		println("Comparing .json files of built object and origianl .json file (files should match)...");
+		if(jsonFileNetwork.toString().equals(builtNetwork.toJSON().toString()))
+		{
+			println("PASS! -- Encoding correct!");
+		}
+		else
+		{
+			println("FAIL! -- Encoding failed!");
 		}
 		
 		

@@ -2,7 +2,7 @@
 *Class:             IdDispatcher.java
 *Project:           Node Visualizer
 *Author:            Jason Van Kerkhoven                                             
-*Date of Update:    28/12/2016                                              
+*Date of Update:    22/01/2017                                              
 *Version:           1.2.1                                                      
 *                                                                                   
 *Purpose:           Gives the next valid ID address up to 2^32-1.

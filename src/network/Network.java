@@ -2,17 +2,22 @@
 *Class:             Network.java
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
-*Date of Update:    17/01/2017                                              
-*Version:           1.0.3                                                      
+*Date of Update:    22/01/2017                                              
+*Version:           1.1.0                                                      
 *                                                                                   
 *Purpose:           Controller for a collection of nodes which can be linked to n amount of other nodes.
 *					Nodes are all doubly linked.
 *					Network supports orphaned Nodes (unlinked to anything else in network)
 *
 * 
-*Update Log:		v1.0.3
+*Update Log:		v1.1.0
+*						- toJSON() method changed -- Nodes no longer show inLinks (as data is never used)
+*						- fromJson(...) method debugged
+*						- fromJson(...) method rewritten for rev3 .json format
+*					v1.0.3
 *						- methods for changing a current nodes value added (both directly and via ID hash)
 *						- toJSON(...) method implemented
+*						- fromJson(...) method added (really buggy)
 *					v1.0.2
 *						- accessor for nodes returns Collection<Node> instead of Collection<Object> now
 *					v1.0.1
@@ -302,6 +307,7 @@ public class Network implements ToJSONFile
 			JsonFile nodeJson = new JsonFile(file.getNetOffset());
 			nodeJson.newBlock();
 			
+			/*
 			//add inLink block
 			nodeJson.addField("inLinks", "");
 			nodeJson.newBlock();
@@ -310,6 +316,7 @@ public class Network implements ToJSONFile
 				nodeJson.add(n.getId()+"\n");
 			}
 			nodeJson.endBlock();
+			*/
 			
 			//add outlink block
 			nodeJson.addField("outLinks", "");
@@ -345,10 +352,15 @@ public class Network implements ToJSONFile
 		//make sure this instance is in its default state
 		this.clear();
 		
-		//split at newlines, remove all tabs, remove spaces
-		JsonFile = JsonFile.replaceAll("\t", "");
-		JsonFile = JsonFile.replaceAll(" ", "");
-		String[] fileLine = JsonFile.split("\n");
+		/*split at newlines, remove all tabs, remove spaces
+		 * keep one copy of tab-space filtered, seperated at \n		fileLine
+		 * keep one copt of tab filtered, seperated at \n			fileLineSpace
+		 */
+		String intermediate = JsonFile.replaceAll("\t", "");
+		String[] fileLineSpace = intermediate.split("\n");
+		intermediate = intermediate.replaceAll(" ", "");
+		String[] fileLine = intermediate.split("\n");
+		intermediate = null;
 		
 		//make sure there is a starting block
 		if (!fileLine[line].equals("{"))
@@ -413,7 +425,7 @@ public class Network implements ToJSONFile
 						{
 							//parse info
 							int id = Integer.parseInt(pair[0]);
-							String value = pair[1];
+							String value = fileLineSpace[line].substring(fileLineSpace[line].indexOf('"')+1, fileLineSpace[line].length()-1);	//TODO this can be improved
 							
 							//create node with id and add
 							Node node = new Node(value, id);
@@ -451,13 +463,11 @@ public class Network implements ToJSONFile
 			//check for starting sub-block denoting which node
 			if(fileLine[line].contains("{"))
 			{
-				block++;
-				
 				int currentNode;
 				
 				//isolate node id and convert to int
 				String filteredLine = fileLine[line].replaceAll("\"node", "");
-				filteredLine = filteredLine.replaceAll("\":{", "");
+				filteredLine = filteredLine.replaceAll("\":\\{", "");
 				try
 				{
 					currentNode = Integer.parseInt(filteredLine);
@@ -466,8 +476,53 @@ public class Network implements ToJSONFile
 				{
 					throw new JsonException("Node id invalid -- must be of type integer", JsonException.ERR_BAD_VALUE);
 				}
+				line++;
 				
-				//TODO check and set inLinks/outLinks
+				//check and set outLinks
+				if (fileLine[line].equals("\"outLinks\":{"))
+				{
+					line++;
+					
+					//get all inLinks
+					while(!fileLine[line].equals("}"))
+					{
+						try
+						{
+							//get id and link
+							int toLink = Integer.parseInt(fileLine[line]);
+							this.link(currentNode, toLink);
+						}
+						catch (NumberFormatException e)
+						{
+							throw new JsonException("Node id invalid -- must be of type integer", JsonException.ERR_BAD_VALUE);
+						}
+						catch (NetworkException e)
+						{
+							throw new JsonException("Node id invalid -- multiple links to same node", JsonException.ERR_BAD_VALUE);
+						}
+						line++;
+					}
+					line++;
+					
+					//confirm termination of node block
+					if(!fileLine[line].equals("}"))
+					{
+						throw new JsonException("inLinks field not found", JsonException.ERR_BAD_FIELD);
+					}
+					line++;
+				}
+				else
+				{
+					throw new JsonException("outLinks field not found", JsonException.ERR_BAD_FIELD);
+				}
+			}
+			else if (fileLine[line].equals("}"))
+			{
+				block--;
+			}
+			else
+			{
+				throw new JsonException("Improper blocking format", JsonException.ERR_FORMAT);
 			}
 		}
 	}
