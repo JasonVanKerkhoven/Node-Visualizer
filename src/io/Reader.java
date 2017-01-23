@@ -34,6 +34,13 @@ public class Reader
 	public Reader()
 	{
 	}
+	
+	
+	//
+	private void getFilePath()
+	{
+		
+	}
 
 	
 	//read a file into an array of bytes

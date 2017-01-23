@@ -244,6 +244,98 @@ public class JsonTestBench
 		
 		
 		
+		//test from .json for Network
+		////////////////////////////////////////////////////////////////////////////////////////////
+		println("\n\nTesting Network.java from .json..." + DIV);
+		network = new Network();
+		builtNetwork = new Network();
+		jsonFileNetwork = null;
+		JsonFile jsonFileBuilt = null;
+		
+		try
+		{
+			/*build original network modeling:
+			 * 
+			 *	 	|--> node 0 ----> node 1 ----> node 3 ----> node 5
+			 * 		|		|
+			 * 		|		|-------> node 2 ----> node 4
+			 * 		|								|
+			 * 		|<------------------------------|
+			 * 											node 15 <---> node 6
+			 * 
+			 * 											node 8
+			 */
+			
+			//build initial network
+			//adding nodes
+			println("Building network...");
+			println("Adding nodes...");
+			for (int i=0; i < 16; i++)
+			{
+				network.add("node " + i);
+			}
+			
+			//remove superfluous nodes
+			println("Removing superfluous nodes...");
+			network.remove(7);
+			for (int i=9; i < 15; i++)
+			{
+				network.remove(i);
+			}
+			
+			//link 'em up
+			println("Linking nodes...");
+			network.link(0,1);
+			network.link(0,2);
+			network.link(1,3);
+			network.link(2, 4);
+			network.link(3,5);
+			network.link(4, 0);
+			network.link(6, 15);
+			network.link(15, 6);
+			println("Network built!");
+			
+			//generate .json
+			println("Generating .json file...");
+			jsonFileNetwork = network.toJSON();
+			println(".json file built!...");
+			
+			//build from .json
+			println("Building new Network from .json");
+			builtNetwork.fromJSON(jsonFileNetwork.toString());
+			println("New Network built!");
+		}
+		catch (Exception e)
+		{
+			println("Error building object");
+			println(e.toString());
+		}
+		
+		println("Printing diagnostics...");
+		
+		//print json used
+		println("\n.json file used\n-----------------------");
+		print(jsonFileNetwork.toString());
+		println("-------------------------");
+		
+		//print json of object built
+		println("\n.json file of built object\n-----------------------");
+		print(builtNetwork.toJSON().toString());
+		println("-------------------------");
+
+		//compare (they should be equal)
+		println("Comparing .json files of built object and origianl .json file (files should match)...");
+		if(jsonFileNetwork.toString().equals(builtNetwork.toJSON().toString()))
+		{
+			println("PASS! -- Encoding correct!");
+		}
+		else
+		{
+			println("FAIL! -- Encoding failed!");
+		}
+		
+		
+		
 		
 		print("\n\n\n-- end");
 	}
