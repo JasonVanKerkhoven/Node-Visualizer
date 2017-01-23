@@ -1,5 +1,5 @@
 /**
-*Class:             ListAndStringDialog.java
+\*Class:             ListAndStringDialog.java
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
 *Date of Update:    16/01/2016                                              

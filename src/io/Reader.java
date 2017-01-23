@@ -11,88 +11,62 @@
 *					Modified from TFTPReader v1.0.0, written 26/09/2016 for TFTP Project
 * 
 * 
-*Update Log			v1.1.0
-*						- minor modifications to move TFTPReader over to generic Reader
-*						  (TFTPReader would divide file into segments of 512B)
-*					v1.0.0
-*						- null
+*Update Log			v1.0.0
+*						- 4 main methods added
+*						- structured as completely static class
 */
 package io;
+
+//imports
+import java.io.*;
+import java.nio.file.Files;
+import java.util.*;
+
 
 //imports
 import java.io.*;
 import java.util.*;
 
 
-public class Reader 
-{
-	//declaring local instance variables
-	byte[] rawBytes;
-
-	
-	//generic constructor
-	public Reader()
+public abstract class Reader extends BasicIO
+{	
+	//reads file passed to it, returns a string
+	public static String readAsString(String msg) throws FileNotFoundException
 	{
-	}
-	
-	
-	//
-	private void getFilePath()
-	{
+		File file = Reader.getFile(msg);
 		
-	}
-
-	
-	//read a file into an array of bytes
-	public void read(String file) throws FileNotFoundException, IOException  
-	{
-		//declaring local variables
-		int b = 0;
-		int i = 0;
-
-		//load buffer with data
-		BufferedInputStream input = new BufferedInputStream(new FileInputStream(file));
-	
-		//run until buffer is empty
-		while( (b=input.read()) != -1)
+		if (file != null)
 		{
-			b;
+			String content = new Scanner(file).useDelimiter("\\Z").next();
+			System.out.println(content);
+			return content;
 		}
-
-		//close buffer
-		input.close();
+		else
+		{
+			return null;
+		}
 	}
 	
-	/*
-	//test function please ignore
-	public static void main(String args[])
+	
+	//prompts the user to select a file, reads it as an array of bytes
+	public static byte[] readAsBytes() throws FileNotFoundException
 	{
-		TFTPReader reader = new TFTPReader();
-		int n = 0 ;
-		byte[] arr ;
-		
+		return null;
+	}
+
+	
+	public static void main(String[] args)
+	{
 		try
 		{
-			reader.readAndSplit("DatagramsOutForHarambe.txt");
+			Reader.readAsString("test");
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
-			e.printStackTrace();
-			System.exit(1);
-		}
-		
-		System.out.println("Packets: " + reader.arrNum());
-		while ( !(reader.isEmpty()) )
-		{
-			n++;
-			arr = reader.pop();
-			System.out.println("Packet #" + n + ": " + arr.length + " Bytes");
-			for(int i=0; i<arr.length; i++)
-			{
-				System.out.println("  " + (char)arr[i] + " | " + arr[i]);
-			}
+			System.out.println("ERROR");
 		}
 	}
-	*/
+	
+	
 	
 }

@@ -1,5 +1,5 @@
 /**
-*Class:             JsonTestBench.java
+i*Class:            JsonTestBench.java
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
 *Date of Update:    19/01/2017                                              

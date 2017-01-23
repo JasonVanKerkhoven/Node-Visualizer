@@ -1,6 +1,6 @@
 package io;
 
-public class Writter 
+public abstract class Writter extends BasicIO
 {
 
 }
