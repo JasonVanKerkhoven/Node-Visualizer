@@ -15,6 +15,7 @@
 package io.json;
 
 
+@SuppressWarnings("serial")
 public class JsonException extends Exception 
 {
 	//declaring static class constants

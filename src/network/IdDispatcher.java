@@ -26,12 +26,12 @@
 */
 package network;
 
+
 //import packages
 import io.json.*;
 
 //import external libraries
 import java.util.LinkedList;
-import java.io.IOException;
 
 
 public class IdDispatcher implements ToJSONFile
@@ -173,7 +173,6 @@ public class IdDispatcher implements ToJSONFile
 		try
 		{
 			//declaring method variables
-			int blockCount = 0;
 			int line = 0;
 			
 			//make sure this instance is in its default state
@@ -260,7 +259,6 @@ public class IdDispatcher implements ToJSONFile
 				throw new JsonException("retired field not found", JsonException.ERR_BAD_FIELD);
 			}
 			line++;
-			blockCount++;
 			
 			
 			//get data from retired block
@@ -278,7 +276,6 @@ public class IdDispatcher implements ToJSONFile
 				}
 				line++;
 			}
-			blockCount--;
 			line++;
 			
 			//check for termination of prime block

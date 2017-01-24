@@ -15,11 +15,7 @@ i*Class:            JsonTestBench.java
 package tests;
 
 
-//import stuff
-import java.util.ArrayList;
-
 //imports from local packages
-import io.*;
 import io.json.JsonException;
 import io.json.JsonFile;
 import network.*;
@@ -44,7 +40,6 @@ public class JsonTestBench
 	{
 		//working instance variables
 		JsonFile jsonFileNetwork, jsonFileId;
-		String expected;
 		IdDispatcher dispatch = new IdDispatcher();
 		Network network = new Network();
 		final String DIV = "\n==================================================================================================================";
@@ -250,7 +245,6 @@ public class JsonTestBench
 		network = new Network();
 		builtNetwork = new Network();
 		jsonFileNetwork = null;
-		JsonFile jsonFileBuilt = null;
 		
 		try
 		{

@@ -60,7 +60,3 @@ Template models following network:
 		}
 	}
 }
-
-
-
-

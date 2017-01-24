@@ -48,14 +48,12 @@
 package network;
 
 
-
 //import packages
 import io.json.*;
 
 //import external libraries
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 

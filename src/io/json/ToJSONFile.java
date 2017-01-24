@@ -16,10 +16,6 @@
 package io.json;
 
 
-//imports
-import java.io.IOException;
-
-
 public interface ToJSONFile
 {
 	//write

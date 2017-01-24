@@ -12,6 +12,7 @@
 */
 package ui;
 
+@SuppressWarnings("serial")
 public class StringParsingException extends Exception
 {
 	public StringParsingException(String msg)

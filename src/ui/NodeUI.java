@@ -125,7 +125,6 @@ public class NodeUI implements KeyListener
 		//initialize things
 		inputBuffer = new CappedBuffer(25);
 		this.nodes = nodes;
-		String frameTitle;
 
 		
 		//set up main window frame
