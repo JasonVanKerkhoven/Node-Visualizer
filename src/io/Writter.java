@@ -23,7 +23,14 @@ import java.io.IOException;
 
 public abstract class Writter extends BasicIO
 {
-	//write a string to the disk
+	//write a string to a particular location on the disk
+	public static void write(String data, File file) throws IOException
+	{
+		Writter.write(data.getBytes(), file);
+	}
+	
+	
+	//write a string to the disk, get location
 	public static void write(String data) throws IOException 
 	{
 		Writter.write(data.getBytes());
@@ -33,9 +40,15 @@ public abstract class Writter extends BasicIO
 	//write raw bytes to the disk
 	public static void write(byte[] data) throws IOException 
 	{
-		//get directory path
+		//get directory path and write to
 		File file = Writter.getFile("Please select a file");
-
+		Writter.write(data, file);
+	}
+	
+	
+	//write to a file on the disk
+	public static void write(byte[] data, File file) throws IOException
+	{
 		//prep datastream for output
 		FileOutputStream output = new FileOutputStream(file,false);
 		

@@ -2,14 +2,16 @@
 *Class:             NodeVisualizer.java
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
-*Date of Update:    18/01/2016                                              
-*Version:           0.4.0                                         
+*Date of Update:    24/01/2016                                              
+*Version:           0.5.0                                         
 *                                                                                   
 *Purpose:           Main class and logic for Node Visualizer project.
 *					Add nodes, link them, and view.
 * 
 * 
-*Update Log:		v0.4.1
+*Update Log:		v0.5.0
+*						- save as and save function added
+*					v0.4.1
 *						- functionality for linking nodes via menu bar implemented
 *					v0.4.0
 *						- glitch were error pop-up denoting a value must be non "" would 
@@ -45,9 +47,11 @@
 //import external libraries
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
 
 //import internal packages
+import io.*;
 import network.*;
 import ui.*;
 import ui.dialogs.*;
@@ -66,6 +70,7 @@ public class NodeVisualizer implements ActionListener
 	private Network nodes;
 	private boolean verbose;
 	private int lastSavedState;
+	private File workingFile;
 	
 	
 	//generic constructor
@@ -76,6 +81,7 @@ public class NodeVisualizer implements ActionListener
 		ui = new NodeUI(NAME + VERSION, this, nodes);
 		verbose = false;
 		lastSavedState = 0;
+		workingFile = null;
 		
 		ui.println("Node Visualizer running...");
 	}
@@ -139,14 +145,22 @@ public class NodeVisualizer implements ActionListener
 	//save the file as a .node
 	private void save(boolean saveAsMode)
 	{
-		/*
-		 * TODO
-		 * write the data
-		 */
-		
-		
-		//update the savestate hashcode
-		lastSavedState = nodes.hashCode();
+		try
+		{
+			//check if there is a valid working file or use req to select
+			if (saveAsMode || workingFile == null)
+			{
+				Writter.write(nodes.toJSON().toString());
+			}
+			else
+			{
+				Writter.write(nodes.toJSON().toString(), workingFile);
+			}
+		}
+		catch (IOException e)
+		{
+			ui.printError("An error occured while trying to save the file to disk.", "Save Error");
+		}
 	}
 	
 	
