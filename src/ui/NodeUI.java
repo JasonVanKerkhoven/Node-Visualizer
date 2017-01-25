@@ -2,15 +2,19 @@
 *Class:             NodeException.java
 *Project:           Node-Visualizer
 *Author:            Jason Van Kerkhoven                                             
-*Date of Update:    18/01/2016                                              
-*Version:           0.4.0                                                    
+*Date of Update:    24/01/2017                                              
+*Version:           0.4.1                                                    
 *                                                                                   
 *Purpose:           UI designed to work for NodeVisualizer.java.
 *					Only designed to be accessed by a single thread (not internally synchronized).
 *					Note that while this class points to a Network data type, it NEVER
 *					modifies the Network data.
 * 
-*Update Log:		v0.4.0
+*Update Log:		v0.4.1
+*						- cleanup unused imports
+*						- removed unnecessary variables in some methods
+*						- added "Open" menu item to "File" tab
+*					v0.4.0
 *						- custom dialog built for selecting a target node, and a node linked to the target node
 *						  from a list 
 *						  (NodeLinkDialog.java)
@@ -90,6 +94,7 @@ public class NodeUI implements KeyListener
 	public static final String MENU_EXIT = "m/file/exit";
 	public static final String MENU_SAVE = "m/file/save";
 	public static final String MENU_SAVEAS = "m/file/saveas";
+	public static final String MENU_OPEN = "m/file/open";
 	
 	public static final String MENU_ADDNEW = "m/node/add";
 	public static final String MENU_REMOVE = "m/node/remove";
@@ -159,7 +164,9 @@ public class NodeUI implements KeyListener
 		JMenuItem mntmNew = new JMenuItem("New");
 		JMenuItem mntmSave = new JMenuItem("Save");
 		JMenuItem mntmSaveAs = new JMenuItem("Save As");
+		JMenuItem mntmOpen = new JMenuItem("Open");
 		mnFile.add(mntmNew);
+		mnFile.add(mntmOpen);
 		mnFile.add(mntmSave);
 		mnFile.add(mntmSaveAs);
 		mnFile.add(mntmExit);
@@ -168,11 +175,13 @@ public class NodeUI implements KeyListener
 		mntmNew.setActionCommand(MENU_NEW);
 		mntmSave.setActionCommand(MENU_SAVE);
 		mntmSaveAs.setActionCommand(MENU_SAVEAS);
+		mntmOpen.setActionCommand(MENU_OPEN);
 		
 		mntmExit.addActionListener(listener);
 		mntmNew.addActionListener(listener);
 		mntmSave.addActionListener(listener);
 		mntmSaveAs.addActionListener(listener);
+		mntmOpen.addActionListener(listener);
 		
 		
 		//add menu items to "Node" category

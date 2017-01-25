@@ -27,14 +27,14 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public abstract class BasicIO 
 {
 	//allow the user to select a file, do not force them to select
-	protected static File getFile(String msg)
+	public static File getFile(String msg)
 	{
 		return getFile(msg, false);
 	}
 	
 	
 	//allow to user to select a file
-	protected static File getFile(String msg, boolean mustSelectFile)
+	public static File getFile(String msg, boolean mustSelectFile)
 	{
 		while(true)
 		{

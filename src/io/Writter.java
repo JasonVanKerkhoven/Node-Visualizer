@@ -49,13 +49,17 @@ public abstract class Writter extends BasicIO
 	//write to a file on the disk
 	public static void write(byte[] data, File file) throws IOException
 	{
-		//prep datastream for output
-		FileOutputStream output = new FileOutputStream(file,false);
-		
-		//write
-		output.write(data);
-		
-		//close stream
-		output.close();
+		//check for valid file
+		if(file != null)
+		{
+			//prep datastream for output
+			FileOutputStream output = new FileOutputStream(file,false);
+			
+			//write
+			output.write(data);
+			
+			//close stream
+			output.close();
+		}
 	}
 }

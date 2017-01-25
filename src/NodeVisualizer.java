@@ -11,6 +11,8 @@
 * 
 *Update Log:		v0.5.0
 *						- save as and save function added
+*						- load saved network functionality added
+*						- open tab event handling
 *					v0.4.1
 *						- functionality for linking nodes via menu bar implemented
 *					v0.4.0
@@ -48,10 +50,12 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 //import internal packages
 import io.*;
+import io.json.*;
 import network.*;
 import ui.*;
 import ui.dialogs.*;
@@ -61,7 +65,7 @@ public class NodeVisualizer implements ActionListener
 {
 	//declaring local static class constants
 	public static final String NAME = "Node Visualizer";
-	public static final String VERSION = " v0.4.0";
+	public static final String VERSION = " v0.5.0";
 	private static final String UNKNOWN_INPUT_MSG = "Unknown Command";
 	private static final String OP_ERROR_NODE = "Nodes must be entered as 'node#' or '#'.\nWhere # is is any valid integer";
 	
@@ -92,6 +96,7 @@ public class NodeVisualizer implements ActionListener
 	{	
 		lastSavedState = 0;
 		verbose = false;
+		workingFile = null;
 		ui.clearConsole();
 		nodes.clear();
 		ui.updateNodeList();
@@ -142,6 +147,37 @@ public class NodeVisualizer implements ActionListener
 	}
 	
 	
+	//load a network from the disk
+	private void load()
+	{
+		reset();
+		
+		try 
+		{
+			//get file
+			File file = Reader.getFile("Please select the File you wish to load");
+			String json = Reader.readAsString(file);
+			
+			//check if file selected
+			if(json != null)
+			{
+				//build new Network and update ui
+				nodes.fromJSON(json);
+				ui.updateNodeList();
+				workingFile = file;
+			}
+		} 
+		catch (FileNotFoundException e) 
+		{
+			e.printStackTrace();
+		}
+		catch (JsonException e)
+		{
+			
+		}
+	}
+	
+	
 	//save the file as a .node
 	private void save(boolean saveAsMode)
 	{
@@ -150,12 +186,9 @@ public class NodeVisualizer implements ActionListener
 			//check if there is a valid working file or use req to select
 			if (saveAsMode || workingFile == null)
 			{
-				Writter.write(nodes.toJSON().toString());
+				workingFile = BasicIO.getFile("Please select a file to load");
 			}
-			else
-			{
-				Writter.write(nodes.toJSON().toString(), workingFile);
-			}
+			Writter.write(nodes.toJSON().toString(), workingFile);
 		}
 		catch (IOException e)
 		{
@@ -500,7 +533,7 @@ public class NodeVisualizer implements ActionListener
 		//determine source and handle accordingly
 		String cmd = ae.getActionCommand();
 		switch(cmd)
-		{
+		{		
 			//exit program
 			case(NodeUI.MENU_EXIT):
 				reqExit();
@@ -510,6 +543,11 @@ public class NodeVisualizer implements ActionListener
 			case(NodeUI.MENU_NEW):
 				reqReset();
 				break;	
+				
+			//open a saved node network
+			case(NodeUI.MENU_OPEN):
+				load();
+				break;
 				
 			//save the data
 			case(NodeUI.MENU_SAVE):
